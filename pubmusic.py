@@ -88,7 +88,7 @@ class playerCtl:
    
    currentPlaying = ""
    currentPlayingFromVlc = ""
-   playerStatus = "running"
+   vlcIsPlaying = ""
    nextPlaying = []
    # FIXME: Proper Thread termination   
    threadStopper = False
@@ -121,6 +121,8 @@ class playerCtl:
             self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
             logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
             
+         self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
+         
          time.sleep(1)
       
    def startMonitoringThread(self):
@@ -133,6 +135,7 @@ class playerCtl:
    def add(self, filepath):
       self.vlc.add(filepath)     
       self.currentPlaying = filepath
+      self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
       logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(filepath))
       
    def enqueue(self, filepath):
@@ -171,6 +174,9 @@ class playerCtl:
       
    def getVlcInternalCurrentTitle(self):
       return self.vlc.raw("get_title")
+      
+   def getVlcIsCurrentlyPlaying(self):
+      return self.vlc.raw("is_playing")
    
    def getCurrentPlaying(self):
       return self.getCleanTitle(self.currentPlaying)
