@@ -96,11 +96,9 @@ class playerCtl:
    def __init__(self):
       self.vlc.connect()
       logger.dispLogEntry("info", "connected to vlc media player")
-      self.startTitleChangeNotifierThread()
+      self.startMonitoringThread()
             
-   def _titleChangeNotifierThread(self):
-      # TODO: Update notifier thread!!!
-      
+   def _monitoringThread(self):      
       # Sind Threds von Methoden einer Klasseninstanz in Python moeglich. Wenn nicht,
       # dann implementierung Ausserhalb der Klasse mit try-Bloeken um Exceptions
       # durch nicht verfuegbare Methoden zu vermeiden
@@ -114,11 +112,11 @@ class playerCtl:
       # Startwert wird durch add gesetzt oder wenn status ist "playing" dann ein-
       # fach auf ersten empfangenen Wert setzen
       
-      # FIXME: Proper Thread termination
       time.sleep(2)
       self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle() 
-      while self.threadStopper == False:
+      while self.threadStopper == False: # FIXME: Proper Thread termination
          if self.currentPlayingFromVlc != self.getVlcInternalCurrentTitle():
+            # Playing title has changed
             self.currentPlaying = self.nextPlaying.pop(0)
             self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
             logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
@@ -127,10 +125,10 @@ class playerCtl:
       
       #print("not implemented yet, TODO")
       
-   def startTitleChangeNotifierThread(self):
-      Thread(target=self._titleChangeNotifierThread).start()
+   def startMonitoringThread(self):
+      Thread(target=self._monitoringThread).start()
       
-   def stopTitleChangeNotifierThread(self):
+   def stopMonitoringThread(self):
       # FIXME: Proper Thread termination  
       self.threadStopper = True
       
