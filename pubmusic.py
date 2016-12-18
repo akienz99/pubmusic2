@@ -28,6 +28,53 @@ time.sleep(1)
 
 logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + project_version)
 
+def cliInterface():
+   logger.dispLogEntry("info","preparing cli envoirement")
+   print("Interactive command line for pubmusic2")
+   print("Enter \"help\" for a list of available commands")
+
+   while True:
+      userInput = raw_input("-> ").strip()
+      userCommand = userInput.split(" ")[0]
+      
+      if userCommand == "help":
+         # TODO: Extend help
+         print("Available commands:")
+         print("")
+         print("help - displays this message")
+         print("exit - closes the application")
+         
+      elif userCommand == "volume":
+         if len(userInput.split(" ")) >= 2:
+            if userInput.split(" ")[1] == "up":
+               player.volup()
+               
+            elif userInput.split(" ")[1] == "down":
+               player.voldown()
+               
+            elif isinstance(int(userInput.split(" ")[1]), int):
+               # TODO: Check if given value is int
+               player.volume(userInput.split(" ")[1])
+               
+         else:
+            print("Not enough arguments given")
+            
+      elif userCommand == "next":
+         player.next()
+         
+      elif userCommand == "current":
+         print(player.getCurrentPlaying())
+            
+      elif userCommand == "exit":
+         player.shutdown()
+         sys.exit()
+         
+      else:
+         if userCommand == "":
+            print("No input was given. Please try again!")
+         else:
+            print("Command \"" + userCommand + "\" not found!")
+   
 class playerCtl:
 
    # TODO: Playlist syncronisation with VLC
@@ -137,3 +184,5 @@ class playerCtl:
    
 # Initilalizing our media player controller
 player = playerCtl()
+
+cliThread = Thread(target=cliInterface).start()
