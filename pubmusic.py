@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+from threading import Thread
 from vlcclient import VLCClient
 from ezlogger import ezLogger
 
@@ -48,7 +49,44 @@ class playerCtl:
    def __init__(self):
       self.vlc.connect()
       logger.dispLogEntry("info", "connected to vlc media player")
-         
+      self.startTitleChangeNotifierThread()
+            
+   def _titleChangeNotifierThread(self):
+      # TODO: Update notifier thread!!!
+      
+      # Sind Threds von Methoden einer Klasseninstanz in Python moeglich. Wenn nicht,
+      # dann implementierung Ausserhalb der Klasse mit try-Bloeken um Exceptions
+      # durch nicht verfuegbare Methoden zu vermeiden
+      
+      # Vergleiche get_title mit initialem Titelwert (Intervall 1-2 Sektunden)
+      # Wenn geaendert dann springe weiter in der Playlist und poppe nextPlaying[0]
+      # in currentPlaying. Ausserdem sollte die Aenderung geloggt werden
+      # Wenn Ausgabe leer dann gestoppt (oder pausert???), wenn nur gestoppt dann
+      # leere currentPlaying und setzte (neue) Statusvariable auf "paused"
+      # Bei Aenderung den initialwert auf den des neuen Titels setzen (neue Ausgabe)
+      # Startwert wird durch add gesetzt oder wenn status ist "playing" dann ein-
+      # fach auf ersten empfangenen Wert setzen
+      
+      # FIXME: Proper Thread termination
+      time.sleep(2)
+      self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle() 
+      while self.threadStopper == False:
+         if self.currentPlayingFromVlc != self.getVlcInternalCurrentTitle():
+            self.currentPlaying = self.nextPlaying.pop(0)
+            self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
+            logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
+            
+         time.sleep(1)
+      
+      #print("not implemented yet, TODO")
+      
+   def startTitleChangeNotifierThread(self):
+      Thread(target=self._titleChangeNotifierThread).start()
+      
+   def stopTitleChangeNotifierThread(self):
+      # FIXME: Proper Thread termination  
+      self.threadStopper = True
+      
    def add(self, filepath):
       self.vlc.add(filepath)     
       self.currentPlaying = filepath
