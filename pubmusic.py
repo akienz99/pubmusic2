@@ -185,4 +185,16 @@ class playerCtl:
 # Initilalizing our media player controller
 player = playerCtl()
 
+logger.dispLogEntry("warning","Default configuration loaded")
+
+
+# TESTING
+logger.dispLogEntry("info","Testing procedure activated")
+
+player.add( os.getcwd() + "/media/Dummy Author 1 - Dummy Title 1.mp3")
+player.enqueue( os.getcwd() + "/media/Dummy Author 2 - Dummy Title 2.mp3")
+player.enqueue( os.getcwd() + "/media/Dummy Author 3 - Dummy Title 3.mp3")
+#player.enqueue("/home/andre/Musik/Charts/German.Top.100.Single.Charts.vom.19.09.2016.mit.Co/10. Rag'n'Bone Man - Human.mp3")
+player.volume(100)
+
 cliThread = Thread(target=cliInterface).start()
