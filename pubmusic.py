@@ -24,7 +24,8 @@ logger.dispLogEntry("info", "initializing, please wait...")
 
 os.system("nohup /usr/bin/vlc --intf telnet  --telnet-password admin &>/dev/null &")
 #os.spawnl(os.P_NOWAIT, '/usr/bin/vlc --intf telnet  --telnet-password admin')
-time.sleep(1)
+time.sleep(1) # Waiting for vlc to launch
+# TODO: Check when launched and then continue
 
 logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + project_version)
 
@@ -77,16 +78,15 @@ def cliInterface():
    
 class playerCtl:
 
-   # TODO: Playlist syncronisation with VLC
-   # TODO: Notifications on new song event
+   # TODO: Playlist syncronisation with VLC <- partally, pause/play remaining
    # TODO: Checks for empty playlist
+   # TODO: Prevent calling pop() on a empty list
    # TODO: Music database
    # TODO: MP3 tag access
-   # TODO: onTitleChange Thread
    
    vlc = VLCClient("::1")
    
-   currentPlaying = None
+   currentPlaying = ""
    currentPlayingFromVlc = ""
    playerStatus = "running"
    nextPlaying = []
@@ -94,7 +94,7 @@ class playerCtl:
    threadStopper = False
 
    def __init__(self):
-      self.vlc.connect()
+      self.vlc.connect() #Esthablishing a connection via VLCClient class
       logger.dispLogEntry("info", "connected to vlc media player")
       self.startMonitoringThread()
             
@@ -122,8 +122,6 @@ class playerCtl:
             logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
             
          time.sleep(1)
-      
-      #print("not implemented yet, TODO")
       
    def startMonitoringThread(self):
       Thread(target=self._monitoringThread).start()
@@ -168,7 +166,7 @@ class playerCtl:
       
    def shutdown(self):
       self.vlc.raw("shutdown")
-      self.stopTitleChangeNotifierThread()
+      self.stopMonitoringThread()
       logger.dispLogEntry("info","Shutting down vlc client")
       
    def getVlcInternalCurrentTitle(self):
@@ -178,6 +176,7 @@ class playerCtl:
       return self.getCleanTitle(self.currentPlaying)
       
    def getCleanTitle(self, filepath):
+      # TODO: Add Mp3-Tag reader instead of using file names
       return filepath.split("/")[-1].split(".")[-2].strip()
    
 # Initilalizing our media player controller
