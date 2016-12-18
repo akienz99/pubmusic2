@@ -22,6 +22,7 @@ logger = ezLogger(1)
 
 logger.dispLogEntry("info", "initializing, please wait...")
 
+# TODO: Make the following line multiplatform
 os.system("nohup /usr/bin/vlc --intf telnet  --telnet-password admin &>/dev/null &")
 #os.spawnl(os.P_NOWAIT, '/usr/bin/vlc --intf telnet  --telnet-password admin')
 time.sleep(1) # Waiting for vlc to launch
@@ -30,12 +31,15 @@ time.sleep(1) # Waiting for vlc to launch
 logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + project_version)
 
 def cliInterface():
+   global input
    logger.dispLogEntry("info","preparing cli envoirement")
    print("Interactive command line for pubmusic2")
    print("Enter \"help\" for a list of available commands")
+   try: input = raw_input
+   except NameError: pass
 
    while True:
-      userInput = raw_input("-> ").strip()
+      userInput = input("-> ").strip()
       userCommand = userInput.split(" ")[0]
       
       if userCommand == "help":
