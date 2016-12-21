@@ -69,6 +69,12 @@ def cliInterface():
       elif userCommand == "next":
          player.next()
          
+      elif userCommand == "play":
+         player.raw("play")
+         
+      elif userCommand == "add":
+         player.enqueue(library.getSongList()[int(userInput.split(" ")[1])])
+         
       elif userCommand == "current":
          print(player.getCurrentPlaying())
             
@@ -77,7 +83,14 @@ def cliInterface():
          sys.exit()
          
       elif userCommand == "random":
-         player.add(library.getRandomSong()) #FIXME: Fix playlist support
+        #player.add(library.getRandomSong())
+         player.enqueue(library.getRandomSong())
+         
+      elif userCommand == "library":
+         i = 0
+         for song in library.getSongList():
+            print(str(i) + " " + player.getCleanTitle(song))
+            i = i + 1
          
       else:
          if userCommand == "":
@@ -101,6 +114,7 @@ class playerCtl:
    
    currentPlaying = ""
    currentPlayingFromVlc = ""
+   currentVlcPlaylistId = 4 - 1 # The Vlc playlist index starts with 4
    vlcIsPlaying = ""
    nextPlaying = []
    # FIXME: Proper Thread termination   
@@ -126,19 +140,23 @@ class playerCtl:
       # fach auf ersten empfangenen Wert setzen
       
       time.sleep(0.5)
-      self.currentPlaying = self.nextPlaying.pop(0) #FIXME
+      #self.currentPlaying = self.nextPlaying.pop(0) #FIXME
       self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle() 
       while self.threadStopper == False: # FIXME: Proper Thread termination
-         if self.currentPlayingFromVlc != self.getVlcInternalCurrentTitle():
+         if self.currentPlayingFromVlc != self.getVlcInternalCurrentTitle() and int(self.getVlcIsCurrentlyPlaying()) == 1 :
             # Playing title has changed
             if self.nextPlaying: # If Playlist is not empty
                self.currentPlaying = self.nextPlaying.pop(0)
-            else: # Playlist is empty
-               self.currentPlaying = ""
-               logger.dispLogEntry("warning","playlist is empty")
-               #self.vlc.stop()
+               self.vlc.raw("delete " + str(self.currentVlcPlaylistId))
+               self.currentVlcPlaylistId = self.currentVlcPlaylistId + 1
             self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
             logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
+         if self.getVlcIsCurrentlyPlaying() == "0" and not self.nextPlaying: #FIXME
+            # Playback is stopped and playlist is empty
+            self.currentPlaying = ""
+            self.vlc.raw("delete " + str(self.currentVlcPlaylistId))
+         
+            
             
          self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
          
@@ -159,7 +177,7 @@ class playerCtl:
       self.currentPlaying = filepath
       self.nextPlaying.insert(0, self.currentPlaying)
       self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
-      logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(filepath))
+      #logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(filepath))
       
    def enqueue(self, filepath):
       """
@@ -257,18 +275,5 @@ class playerCtl:
 library = mediaLib()
 # initializing our media player controller
 player = playerCtl()
-
-logger.dispLogEntry("warning","Default configuration loaded")
-
-
-# TESTING
-logger.dispLogEntry("info","Testing procedure activated")
-
-# FIXME: Playlist autostart
-
-for song in library.getSongList():
-   player.enqueue(song)
-
-player.add("./media/Dummy Author 1 - Dummy Title 1.mp3")
 
 cliThread = Thread(target=cliInterface).start()
