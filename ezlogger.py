@@ -1,13 +1,20 @@
-from __future__ import print_function
 import time
 
 class ezLogger:
+   """
+   Simple console logger
    
-   isCurrentlyRunning = False
+   Verbosity levels:
    
-   def __init__(self, verbose_level):
-      # TODO: Add verbosity control
-      verbose = verbose_level
+   0 -> Don't display any messages
+   1 -> Only Errors will get displayed
+   2 -> Errors and warnings will be displayed
+   3 -> All messages will be displayed
+   """
+      
+   def __init__(self, verbose_level=3):
+      self.verbosity = verbose_level
+      self.isCurrentlyRunning = False
       
       # TODO: Add last message
       lastMessage = None;
@@ -18,23 +25,28 @@ class ezLogger:
          time.sleep(0.05)
       
       self.isCurrentlyRunning = True
-      if msg_type == "error":
-         print ("\033[1;31m[error] ", end="")
+      if msg_type == "error" and self.verbosity >= 1:
+         print ("\033[1;31m[error] " + msg_value + "\033[0m")
          
-      elif  msg_type == "warning":
-         print ("\033[1;33m[warning] ", end="")
+      elif msg_type == "warning" and self.verbosity >= 2:
+         print ("\033[1;33m[warning] " + msg_value + "\033[0m")
          
-      elif  msg_type == "playlist":
-         print ("\033[1;32m[playlist] ", end="")
+      elif msg_type == "playlist" and self.verbosity >= 3:
+         print ("\033[1;32m[playlist] " + msg_value + "\033[0m")
          
-      elif  msg_type == "info":
-         print ("\033[1;34m[info] ", end="")
+      elif msg_type == "info" and self.verbosity >= 3:
+         print ("\033[1;34m[info] " + msg_value + "\033[0m")
          
-      else:
-         print ("\033[1;34m["+ msg_type +"] ", end="")
-         
-      print (msg_value + "\033[0m")
+      elif self.verbosity >= 3:
+         print ("\033[1;34m["+ msg_type +"] " + msg_value + "\033[0m")
+
       self.isCurrentlyRunning = False
       
    def getLastMessage(self):
-      return lastMessage
+      return self.lastMessage
+      
+   def getVerbosity(self):
+      return self.verbosity
+      
+   def setVerbosity(self, newValue):
+      self.verbosity = newValue

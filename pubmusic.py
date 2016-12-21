@@ -18,7 +18,7 @@ print ("#######################################################")
 project_version = "0.0.1-alpha1"
 
 # Initializing our logger for use in playerCtl
-logger = ezLogger(1)
+logger = ezLogger()
 
 logger.dispLogEntry("info", "initializing, please wait...")
 
