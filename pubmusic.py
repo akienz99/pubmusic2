@@ -151,7 +151,7 @@ class playerCtl:
                self.currentVlcPlaylistId = self.currentVlcPlaylistId + 1
             self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
             logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
-         if self.getVlcIsCurrentlyPlaying() == "0" and not self.nextPlaying: #FIXME
+         if int(self.getVlcIsCurrentlyPlaying()) == 0 and not self.nextPlaying:
             # Playback is stopped and playlist is empty
             self.currentPlaying = ""
             self.vlc.raw("delete " + str(self.currentVlcPlaylistId))
