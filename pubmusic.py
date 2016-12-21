@@ -121,7 +121,12 @@ class playerCtl:
       while self.threadStopper == False: # FIXME: Proper Thread termination
          if self.currentPlayingFromVlc != self.getVlcInternalCurrentTitle():
             # Playing title has changed
-            self.currentPlaying = self.nextPlaying.pop(0)
+            if self.nextPlaying: # If Playlist is not empty
+               self.currentPlaying = self.nextPlaying.pop(0)
+            else: # Playlist is empty
+               self.currentPlaying = ""
+               logger.dispLogEntry("warning","playlist is empty")
+               #self.vlc.stop()
             self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
             logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
             
@@ -187,7 +192,10 @@ class playerCtl:
       
    def getCleanTitle(self, filepath):
       # TODO: Add Mp3-Tag reader instead of using file names
-      return filepath.split("/")[-1].split(".")[-2].strip()
+      if filepath != "":
+         return filepath.split("/")[-1].split(".")[-2].strip()
+      else:
+         return ""
    
 # Initilalizing our media player controller
 player = playerCtl()
