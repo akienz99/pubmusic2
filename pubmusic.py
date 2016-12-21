@@ -142,55 +142,100 @@ class playerCtl:
       self.threadStopper = True
       
    def add(self, filepath):
+      """
+      Adds and plays the given file to the playlist
+      """
       self.vlc.add(filepath)     
       self.currentPlaying = filepath
       self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
       logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(filepath))
       
    def enqueue(self, filepath):
+      """
+      Adds the given file to the end of the playlist
+      """
       self.vlc.enqueue(filepath)
       self.nextPlaying.append(filepath)
       logger.dispLogEntry("playlist", "Added to queue: " + self.getCleanTitle(filepath))
       
    def next(self):
+      """
+      Plays thje next title in the playlist
+      """
       self.vlc.next()
       
    def volume(self, vol):
+      """
+      Sets the volume to the given input
+      """
       self.vlc.volume(vol)
       logger.dispLogEntry("info","setting volume to " + str(vol))
       
    def volup(self):
+      """
+      Increases the volume by 10 percent
+      """
       self.vlc.volup()
       logger.dispLogEntry("info","raising volume")
       
    def voldown(self):
+      """
+      Lowers the volume by 10 percent
+      """
       self.vlc.voldown()
       logger.dispLogEntry("info","lowering volume")
       
    def stop(self):
+      """
+      Stops the playback
+      """
       self.vlc.stop()
       
    def clear(self):
+      """
+      Clears the playlist
+      """
       self.vlc.clear()
       self.nextPlaying = []
       self.currentPlaying = None
       logger.dispLogEntry("warning","cleared playlist")
       
    def shutdown(self):
+      """
+      Terminates VLC and the title monitoring Thread
+      """
       self.vlc.raw("shutdown")
       self.stopMonitoringThread()
       logger.dispLogEntry("info","Shutting down vlc client")
       
+   def raw(self,command):
+      """
+      Executes a raw telnet command
+      """
+      self.vlc.raw(command)
+      
    def getVlcInternalCurrentTitle(self):
+      """
+      Returns the internal name of the current playing title
+      """
       return self.vlc.raw("get_title")
       
    def getVlcIsCurrentlyPlaying(self):
+      """
+      Returns 1 when playing, 0 when not
+      """
       return self.vlc.raw("is_playing")
    
    def getCurrentPlaying(self):
+      """
+      Returns the current title in a formatted form
+      """
       return self.getCleanTitle(self.currentPlaying)
       
    def getCleanTitle(self, filepath):
+      """
+      Returns the clean title of a given filepath
+      """
       # TODO: Add Mp3-Tag reader instead of using file names
       if filepath != "":
          return filepath.split("/")[-1].split(".")[-2].strip()
