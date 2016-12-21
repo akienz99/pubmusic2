@@ -20,6 +20,9 @@ class ezLogger:
       lastMessage = None;
       
    def dispLogEntry(self, msg_type, msg_value):
+      """
+      Displays a log entry in th console
+      """
       
       while self.isCurrentlyRunning == True:
          time.sleep(0.05)
@@ -43,10 +46,20 @@ class ezLogger:
       self.isCurrentlyRunning = False
       
    def getLastMessage(self):
+      """
+      Gets the last displayed message
+      !! Not implemented yet !!
+      """
       return self.lastMessage
       
    def getVerbosity(self):
+      """
+      Returns the current verbosity level
+      """
       return self.verbosity
       
    def setVerbosity(self, newValue):
+      """
+      Sets the verbosity level
+      """
       self.verbosity = newValue
