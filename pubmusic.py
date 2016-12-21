@@ -1,8 +1,10 @@
+#!/usr/bin/python
 import os
 import sys
 import time
 from threading import Thread
 from vlcclient import VLCClient
+from medialib import mediaLib
 from ezlogger import ezLogger
 
 print ("#######################################################")
@@ -74,6 +76,9 @@ def cliInterface():
          player.shutdown()
          sys.exit()
          
+      elif userCommand == "random":
+         player.add(library.getRandomSong()) #FIXME: Fix playlist support
+         
       else:
          if userCommand == "":
             print("No input was given. Please try again!")
@@ -81,6 +86,10 @@ def cliInterface():
             print("Command \"" + userCommand + "\" not found!")
    
 class playerCtl:
+   """
+   VLC Media Player controller. This class contains the logic to interact
+   with vlcclient and manage current playlist and status.
+   """
 
    # TODO: Playlist syncronisation with VLC <- partally, pause/play remaining
    # TODO: Checks for empty playlist
@@ -116,7 +125,8 @@ class playerCtl:
       # Startwert wird durch add gesetzt oder wenn status ist "playing" dann ein-
       # fach auf ersten empfangenen Wert setzen
       
-      time.sleep(2)
+      time.sleep(0.5)
+      self.currentPlaying = self.nextPlaying.pop(0) #FIXME
       self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle() 
       while self.threadStopper == False: # FIXME: Proper Thread termination
          if self.currentPlayingFromVlc != self.getVlcInternalCurrentTitle():
@@ -147,6 +157,7 @@ class playerCtl:
       """
       self.vlc.add(filepath)     
       self.currentPlaying = filepath
+      self.nextPlaying.insert(0, self.currentPlaying)
       self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
       logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(filepath))
       
@@ -242,7 +253,9 @@ class playerCtl:
       else:
          return ""
    
-# Initilalizing our media player controller
+# initializing our media library
+library = mediaLib()
+# initializing our media player controller
 player = playerCtl()
 
 logger.dispLogEntry("warning","Default configuration loaded")
@@ -251,9 +264,11 @@ logger.dispLogEntry("warning","Default configuration loaded")
 # TESTING
 logger.dispLogEntry("info","Testing procedure activated")
 
-player.add( os.getcwd() + "/media/Dummy Author 1 - Dummy Title 1.mp3")
-player.enqueue( os.getcwd() + "/media/Dummy Author 2 - Dummy Title 2.mp3")
-player.enqueue( os.getcwd() + "/media/Dummy Author 3 - Dummy Title 3.mp3")
-player.volume(100)
+# FIXME: Playlist autostart
+
+for song in library.getSongList():
+   player.enqueue(song)
+
+player.add("./media/Dummy Author 1 - Dummy Title 1.mp3")
 
 cliThread = Thread(target=cliInterface).start()
