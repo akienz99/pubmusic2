@@ -32,7 +32,7 @@ logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + project_versio
 
 def cliInterface():
    global input
-   logger.dispLogEntry("info","preparing cli envoirement")
+   logger.dispLogEntry("info","preparing cli environment")
    print("Interactive command line for pubmusic2")
    print("Enter \"help\" for a list of available commands")
    try: input = raw_input
