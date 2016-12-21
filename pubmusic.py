@@ -105,9 +105,6 @@ class playerCtl:
    """
 
    # TODO: Playlist syncronisation with VLC <- partally, pause/play remaining
-   # TODO: Checks for empty playlist
-   # TODO: Prevent calling pop() on a empty list
-   # TODO: Music database
    # TODO: MP3 tag access
    
    vlc = VLCClient("::1")
@@ -143,20 +140,21 @@ class playerCtl:
       #self.currentPlaying = self.nextPlaying.pop(0) #FIXME
       self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle() 
       while self.threadStopper == False: # FIXME: Proper Thread termination
-         if self.currentPlayingFromVlc != self.getVlcInternalCurrentTitle() and int(self.getVlcIsCurrentlyPlaying()) == 1 :
-            # Playing title has changed
-            if self.nextPlaying: # If Playlist is not empty
-               self.currentPlaying = self.nextPlaying.pop(0)
+         try: # Fixing inconsistency in Vlc playback status
+            if self.currentPlayingFromVlc != self.getVlcInternalCurrentTitle() and int(self.getVlcIsCurrentlyPlaying()) == 1 :
+               # Playing title has changed
+               if self.nextPlaying: # If Playlist is not empty
+                  self.currentPlaying = self.nextPlaying.pop(0)
+                  self.vlc.raw("delete " + str(self.currentVlcPlaylistId))
+                  self.currentVlcPlaylistId = self.currentVlcPlaylistId + 1
+               self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
+               logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
+            if int(self.getVlcIsCurrentlyPlaying()) == 0 and not self.nextPlaying:
+               # Playback is stopped and playlist is empty
+               self.currentPlaying = ""
                self.vlc.raw("delete " + str(self.currentVlcPlaylistId))
-               self.currentVlcPlaylistId = self.currentVlcPlaylistId + 1
-            self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
-            logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
-         if int(self.getVlcIsCurrentlyPlaying()) == 0 and not self.nextPlaying:
-            # Playback is stopped and playlist is empty
-            self.currentPlaying = ""
-            self.vlc.raw("delete " + str(self.currentVlcPlaylistId))
-         
-            
+         except ValueError:
+            pass
             
          self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
          
