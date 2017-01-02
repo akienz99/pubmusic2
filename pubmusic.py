@@ -73,7 +73,10 @@ def cliInterface():
          player.raw("play")
          
       elif userCommand == "add":
-         player.enqueue(library.getSongList()[int(userInput.split(" ")[1])])
+         try:
+            player.enqueue(library.getSongList()[int(userInput.split(" ")[1])])
+         except IndexError:
+            logger.dispLogEntry("warning", "Title with given id not found")
          
       elif userCommand == "current":
          print(player.getCurrentPlaying())
@@ -89,7 +92,7 @@ def cliInterface():
       elif userCommand == "library":
          i = 0
          for song in library.getSongList():
-            print(str(i) + " " + player.getCleanTitle(song))
+            print(str(i).zfill(4) + " - " + player.getCleanTitle(song))
             i = i + 1
          
       else:
