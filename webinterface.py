@@ -1,5 +1,4 @@
 import cherrypy
-<<<<<<< HEAD
 from threading import Thread
 
 class webInterface:
@@ -34,27 +33,3 @@ class webApplication(object):
    logger = None
    player = None
    library = None
-   
-   
-   def __init__(self, logger, player, library):
-      # Setting the class variables to our objects
-      self.logger = logger
-      self.player = player
-      self.library = library
-   
-   @cherrypy.expose
-   def index(self):
-      return self.player.getCurrentPlaying()
-        
-=======
-
-class webInterface:
-   
-   def __init__(self):
-      cherrypy.quickstart(webContent())
-
-class webContent(object):
-   def index(self):
-      return "Hello World!"
-   
->>>>>>> added webinterface.py
