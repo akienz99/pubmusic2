@@ -84,9 +84,13 @@ class cliInterface:
                elif userInput.split(" ")[1] == "down":
                   self.player.voldown()
                   
-               elif isinstance(int(userInput.split(" ")[1]), int):
-                  # TODO: Check if given value is int
-                  self.player.volume(userInput.split(" ")[1])
+               else:
+                  try:
+                     if isinstance(int(userInput.split(" ")[1]), int):
+                        # parameter is a integer
+                        self.player.volume(userInput.split(" ")[1])
+                  except ValueError:
+                     print("given argument has to be \"up\", \"down\" or a number")
                   
             else:
                print("Not enough arguments given")
