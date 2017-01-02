@@ -18,7 +18,7 @@ class mediaLib:
        for name in files:
            self.songList.append(os.path.join(root, name))
    
-   def rescanLibrary(self)
+   def rescanLibrary(self):
       self.scanDir(self.libPath)
  
    def getSongList(self):
