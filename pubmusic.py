@@ -210,3 +210,5 @@ library = mediaLib()
 player = playerCtl()
 # starting the mnain cli interface
 cli = cliInterface(logger, player, library)
+time.sleep(1)
+player.add(library.getRandomSong()) # automatic first song

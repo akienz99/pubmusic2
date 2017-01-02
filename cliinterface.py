@@ -48,8 +48,7 @@ class cliInterface:
             print("library - displays the song library")
             print("")
             print("volume  - controls the playback volume")
-            
-            
+            print("")
             
          elif userCommand == "volume":
             if len(userInput.split(" ")) >= 2:

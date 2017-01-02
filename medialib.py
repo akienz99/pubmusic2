@@ -7,16 +7,20 @@ class mediaLib:
    simple database
    """
    songList = []
+   libPath = "."
    
-   def __init__(self, libPath = os.getcwd() + "/media/"):
-      self.scanDir(libPath)
-      
-      
+   def __init__(self, filePath = os.getcwd() + "/media/"):
+      self.libPath = filePath
+      self.scanDir(self.libPath)
+           
    def scanDir(self, directory = "."):
       for root, dirs, files in os.walk(directory, topdown=False):
        for name in files:
            self.songList.append(os.path.join(root, name))
-           
+   
+   def rescanLibrary(self)
+      self.scanDir(self.libPath)
+ 
    def getSongList(self):
       return self.songList
       
