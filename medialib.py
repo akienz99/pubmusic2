@@ -16,10 +16,7 @@ class mediaLib:
       for root, dirs, files in os.walk(directory, topdown=False):
        for name in files:
            self.songList.append(os.path.join(root, name))
-           #print(os.path.join(root, name))
-       #for name in dirs:
-      #   print(os.path.join(root, name))
-      
+           
    def getSongList(self):
       return self.songList
       
