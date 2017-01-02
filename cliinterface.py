@@ -36,8 +36,20 @@ class cliInterface:
             # TODO: Extend help
             print("Available commands:")
             print("")
-            print("help - displays this message")
-            print("exit - closes the application")
+            print("help    - displays this message")
+            print("exit    - closes the application")
+            print("")
+            print("play    - starts the playback")
+            print("add     - adds a song by id")
+            print("random  - adds a random song")
+            print("next    - skips to the next song")
+            print("")
+            print("current - displays the current playing song")
+            print("library - displays the song library")
+            print("")
+            print("volume  - controls the playback volume")
+            
+            
             
          elif userCommand == "volume":
             if len(userInput.split(" ")) >= 2:
