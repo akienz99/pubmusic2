@@ -25,6 +25,25 @@ manually
 If you like to contribute to this project, feel free to fork and send me a pull
 request. Regular contributors can also get direct access if to the repository.
 
+## Currently implemented features
+
+* Automatic music library
+* Player controller with syncronized playlist
+* Random playing modes
+* Command line interface
+* Logger for displaying information
+* Modular structure
+
+## Upcoming features
+
+* Multiuser Web-interface -> `fb-webinterface` branch
+* MP3-Tag support
+* Auto-DJ based on previous playlists
+* permanent library
+* permission system
+* API for external control (via HTTP-API)
+* Configuration file
+
 ## License
 
 Licenced under the MIT-License
