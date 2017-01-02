@@ -16,7 +16,6 @@ class ezLogger:
       self.verbosity = verbose_level
       self.isCurrentlyRunning = False
       
-      self.lastMessage = None
       self.messageList = []
       
    def dispLogEntry(self, msg_type, msg_value):
@@ -47,7 +46,6 @@ class ezLogger:
          
       if logMessage != "":
          print (logMessage)
-         self.lastMessage = logMessage
          self.messageList.append(logMessage)
 
       self.isCurrentlyRunning = False
@@ -56,7 +54,7 @@ class ezLogger:
       """
       Gets the last displayed message
       """
-      return self.lastMessage
+      return self.messageList[-1] # TODO: IndexError
       
    def getMessageList(self):
       """
