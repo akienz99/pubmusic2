@@ -32,6 +32,7 @@ class cliInterface:
          userInput = input("-> ").strip()
          userCommand = userInput.split(" ")[0].lower()
          
+         # General commands
          if userCommand == "help":
             # TODO: Extend help
             print("Available commands:")
@@ -44,13 +45,36 @@ class cliInterface:
             print("random   - adds a random song")
             print("autofill - adds 10 random songs")
             print("next     - skips to the next song")
+            print("volume   - controls the playback volume")
             print("")
             print("current  - displays the current playing song")
             print("library  - displays the song library")
             print("")
-            print("volume   - controls the playback volume")
-            print("")
             
+         elif userCommand == "exit":
+            self.player.shutdown()
+            sys.exit()
+            
+         # playback control        
+         elif userCommand == "play":
+            self.player.raw("play")
+            
+         elif userCommand == "add":
+            try:
+               self.player.enqueue(self.library.getSongList()[int(userInput.split(" ")[1])])
+            except IndexError:
+               self.logger.dispLogEntry("warning", "Title with given id not found")
+ 
+         elif userCommand == "random":
+            self.player.enqueue(self.library.getRandomSong())
+             
+         elif userCommand == "autofill":
+            for x in range(0,10):
+               self.player.enqueue(self.library.getRandomSong())
+         
+         elif userCommand == "next":
+            self.player.next()
+     
          elif userCommand == "volume":
             if len(userInput.split(" ")) >= 2:
                if userInput.split(" ")[1] == "up":
@@ -65,40 +89,18 @@ class cliInterface:
                   
             else:
                print("Not enough arguments given")
-               
-         elif userCommand == "next":
-            self.player.next()
-            
-         elif userCommand == "play":
-            self.player.raw("play")
-            
-         elif userCommand == "add":
-            try:
-               self.player.enqueue(self.library.getSongList()[int(userInput.split(" ")[1])])
-            except IndexError:
-               self.logger.dispLogEntry("warning", "Title with given id not found")
-            
+         
+         # Informative commands
          elif userCommand == "current":
             print(self.player.getCurrentPlaying())
-               
-         elif userCommand == "exit":
-            self.player.shutdown()
-            sys.exit()
-            
-         elif userCommand == "random":
-           #player.add(self.library.getRandomSong())
-            self.player.enqueue(self.library.getRandomSong())
-            
+           
          elif userCommand == "library":
             i = 0
             for song in library.getSongList():
                print(str(i).zfill(4) + " - " + self.player.getCleanTitle(song))
                i = i + 1
          
-         elif userCommand == "autofill":
-            for x in range(0,10):
-               self.player.enqueue(self.library.getRandomSong())
-            
+         # No input given
          else:
             if userCommand == "":
                print("No input was given. Please try again!")
