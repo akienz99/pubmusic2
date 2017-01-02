@@ -1,6 +1,5 @@
 import sys
 from threading import Thread
-from ezlogger import ezLogger
 
 class cliInterface:
    
@@ -63,7 +62,7 @@ class cliInterface:
             
          elif userCommand == "add":
             try:
-               self.player.enqueue(library.getSongList()[int(userInput.split(" ")[1])])
+               self.player.enqueue(self.library.getSongList()[int(userInput.split(" ")[1])])
             except IndexError:
                self.logger.dispLogEntry("warning", "Title with given id not found")
             
