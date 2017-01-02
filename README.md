@@ -15,6 +15,11 @@ reordering.
 * Python 2.7 or Python 3 environment
 * Installation of VLC Media Player
 
+Note: This software can be used on non-unix systems. However, you have to comment
+out the line `os.system("nohup /usr/bin/vlc --intf telnet  --telnet-password 
+admin &>/dev/null &")` in pubmusic.py and start a telnet instance of vlc
+manually
+
 ## Contribution
 
 If you like to contribute to this project, feel free to fork and send me a pull
