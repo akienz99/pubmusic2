@@ -278,7 +278,11 @@ library = mediaLib( config.media_dir )
 player = playerCtl( config.startVolume )
 # starting the main cli interface
 cli = cliInterface(logger, player, library)
+<<<<<<< HEAD
 web = webInterface(logger, player, library)
+=======
+web = webInterface()
+>>>>>>> added webinterface.py
 time.sleep(1)
 if config.autostart_playback:
    player.add(library.getRandomSong()) # automatic first song
