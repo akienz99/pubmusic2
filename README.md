@@ -14,6 +14,7 @@ reordering.
 * Unix-based operation system (Multiplatform support is coming soon)
 * Python 2.7 or Python 3 environment
 * Installation of VLC Media Player
+* cherryPy as dependency for the webinterface -> `pip install cherrypy`
 
 Note: This software can be used on non-unix systems. However, you have to comment
 out the line `os.system("nohup /usr/bin/vlc --intf telnet  --telnet-password 
