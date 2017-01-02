@@ -30,24 +30,25 @@ class cliInterface:
 
       while True:
          userInput = input("-> ").strip()
-         userCommand = userInput.split(" ")[0]
+         userCommand = userInput.split(" ")[0].lower()
          
          if userCommand == "help":
             # TODO: Extend help
             print("Available commands:")
             print("")
-            print("help    - displays this message")
-            print("exit    - closes the application")
+            print("help     - displays this message")
+            print("exit     - closes the application")
             print("")
-            print("play    - starts the playback")
-            print("add     - adds a song by id")
-            print("random  - adds a random song")
-            print("next    - skips to the next song")
+            print("play     - starts the playback")
+            print("add      - adds a song by id")
+            print("random   - adds a random song")
+            print("autofill - adds 10 random songs")
+            print("next     - skips to the next song")
             print("")
-            print("current - displays the current playing song")
-            print("library - displays the song library")
+            print("current  - displays the current playing song")
+            print("library  - displays the song library")
             print("")
-            print("volume  - controls the playback volume")
+            print("volume   - controls the playback volume")
             print("")
             
          elif userCommand == "volume":
@@ -93,6 +94,10 @@ class cliInterface:
             for song in library.getSongList():
                print(str(i).zfill(4) + " - " + self.player.getCleanTitle(song))
                i = i + 1
+         
+         elif userCommand == "autofill":
+            for x in range(0,10):
+               self.player.enqueue(self.library.getRandomSong())
             
          else:
             if userCommand == "":
