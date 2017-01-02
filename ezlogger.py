@@ -20,7 +20,7 @@ class ezLogger:
       
    def dispLogEntry(self, msg_type, msg_value):
       """
-      Displays a log entry in th console
+      Displays a log entry in the console
       """
       
       while self.isCurrentlyRunning == True:
@@ -49,6 +49,34 @@ class ezLogger:
          self.messageList.append(logMessage)
 
       self.isCurrentlyRunning = False
+      
+   # Short calls for different log types -> future
+      
+   def error(self, message):
+      """
+      Displays an error message in the log
+      """
+      self.dispLogEntry("error", message)
+      
+   def warning(self, message):
+      """
+      Displays an warning message in the log
+      """
+      self.dispLogEntry("warning", message)
+      
+   def playlist(self, message):
+      """
+      Displays a playlist info in the log
+      """
+      self.dispLogEntry("playlist", message)
+      
+   def info(self, message):
+      """
+      Displays an info message in the log
+      """
+      self.dispLogEntry("info", message)
+      
+   # getters and setters
       
    def getLastMessage(self):
       """
