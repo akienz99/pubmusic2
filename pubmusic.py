@@ -6,6 +6,7 @@ from threading import Thread
 from vlcclient import VLCClient
 from medialib import mediaLib
 from ezlogger import ezLogger
+from cliinterface import cliInterface
 
 print ("#######################################################")
 print ("#  _____       _                         _      ___   #")
@@ -31,75 +32,6 @@ time.sleep(1) # Waiting for vlc to launch
 # TODO: Check when launched and then continue
 
 logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + project_version)
-
-def cliInterface():
-   global input
-   logger.dispLogEntry("info","preparing cli environment")
-   print("Interactive command line for pubmusic2")
-   print("Enter \"help\" for a list of available commands")
-   try: input = raw_input
-   except NameError: pass
-
-   while True:
-      userInput = input("-> ").strip()
-      userCommand = userInput.split(" ")[0]
-      
-      if userCommand == "help":
-         # TODO: Extend help
-         print("Available commands:")
-         print("")
-         print("help - displays this message")
-         print("exit - closes the application")
-         
-      elif userCommand == "volume":
-         if len(userInput.split(" ")) >= 2:
-            if userInput.split(" ")[1] == "up":
-               player.volup()
-               
-            elif userInput.split(" ")[1] == "down":
-               player.voldown()
-               
-            elif isinstance(int(userInput.split(" ")[1]), int):
-               # TODO: Check if given value is int
-               player.volume(userInput.split(" ")[1])
-               
-         else:
-            print("Not enough arguments given")
-            
-      elif userCommand == "next":
-         player.next()
-         
-      elif userCommand == "play":
-         player.raw("play")
-         
-      elif userCommand == "add":
-         try:
-            player.enqueue(library.getSongList()[int(userInput.split(" ")[1])])
-         except IndexError:
-            logger.dispLogEntry("warning", "Title with given id not found")
-         
-      elif userCommand == "current":
-         print(player.getCurrentPlaying())
-            
-      elif userCommand == "exit":
-         player.shutdown()
-         sys.exit()
-         
-      elif userCommand == "random":
-        #player.add(library.getRandomSong())
-         player.enqueue(library.getRandomSong())
-         
-      elif userCommand == "library":
-         i = 0
-         for song in library.getSongList():
-            print(str(i).zfill(4) + " - " + player.getCleanTitle(song))
-            i = i + 1
-         
-      else:
-         if userCommand == "":
-            print("No input was given. Please try again!")
-         else:
-            print("Command \"" + userCommand + "\" not found!")
    
 class playerCtl:
    """
@@ -276,5 +208,5 @@ class playerCtl:
 library = mediaLib()
 # initializing our media player controller
 player = playerCtl()
-
-cliThread = Thread(target=cliInterface).start()
+# starting the mnain cli interface
+cli = cliInterface(logger, player, library)
