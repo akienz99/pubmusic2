@@ -7,7 +7,7 @@ class ezLogger:
    Verbosity levels:
    
    0 -> Don't display any messages
-   1 -> Only Errors will get displayed
+   1 -> Only Errors will be displayed
    2 -> Errors and warnings will be displayed
    3 -> All messages will be displayed
    """
@@ -82,7 +82,10 @@ class ezLogger:
       """
       Gets the last displayed message
       """
-      return self.messageList[-1] # TODO: IndexError
+      try:
+         return self.messageList[-1]
+      except IndexError:
+         return ""
       
    def getMessageList(self):
       """

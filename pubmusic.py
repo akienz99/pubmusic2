@@ -27,9 +27,7 @@ logger.dispLogEntry("info", "initializing, please wait...")
 
 # TODO: Make the following line multiplatform
 os.system("nohup /usr/bin/vlc --intf telnet  --telnet-password admin &>/dev/null &")
-#os.spawnl(os.P_NOWAIT, '/usr/bin/vlc --intf telnet  --telnet-password admin')
 time.sleep(1) # Waiting for vlc to launch
-# TODO: Check when launched and then continue
 
 logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + project_version)
    
@@ -39,7 +37,7 @@ class playerCtl:
    with vlcclient and manage current playlist and status.
    """
 
-   # TODO: Playlist syncronisation with VLC <- partally, pause/play remaining
+   # TODO: play/pause syncronisation with VLC
    # TODO: MP3 tag access
    
    vlc = VLCClient("::1")
@@ -49,7 +47,6 @@ class playerCtl:
    currentVlcPlaylistId = 4 - 1 # The Vlc playlist index starts with 4
    vlcIsPlaying = ""
    nextPlaying = []
-   # FIXME: Proper Thread termination   
    threadStopper = False
 
    def __init__(self):
@@ -58,23 +55,10 @@ class playerCtl:
       self.startMonitoringThread()
             
    def _monitoringThread(self):      
-      # Sind Threds von Methoden einer Klasseninstanz in Python moeglich. Wenn nicht,
-      # dann implementierung Ausserhalb der Klasse mit try-Bloeken um Exceptions
-      # durch nicht verfuegbare Methoden zu vermeiden
-      
-      # Vergleiche get_title mit initialem Titelwert (Intervall 1-2 Sektunden)
-      # Wenn geaendert dann springe weiter in der Playlist und poppe nextPlaying[0]
-      # in currentPlaying. Ausserdem sollte die Aenderung geloggt werden
-      # Wenn Ausgabe leer dann gestoppt (oder pausert???), wenn nur gestoppt dann
-      # leere currentPlaying und setzte (neue) Statusvariable auf "paused"
-      # Bei Aenderung den initialwert auf den des neuen Titels setzen (neue Ausgabe)
-      # Startwert wird durch add gesetzt oder wenn status ist "playing" dann ein-
-      # fach auf ersten empfangenen Wert setzen
       
       time.sleep(0.5)
-      #self.currentPlaying = self.nextPlaying.pop(0) #FIXME
       self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle() 
-      while self.threadStopper == False: # FIXME: Proper Thread termination
+      while self.threadStopper == False:
          try: # Fixing inconsistency in Vlc playback status
             if self.currentPlayingFromVlc != self.getVlcInternalCurrentTitle() and int(self.getVlcIsCurrentlyPlaying()) == 1 :
                # Playing title has changed
@@ -99,7 +83,6 @@ class playerCtl:
       Thread(target=self._monitoringThread).start()
       
    def stopMonitoringThread(self):
-      # FIXME: Proper Thread termination  
       self.threadStopper = True
       
    def add(self, filepath):
@@ -110,7 +93,6 @@ class playerCtl:
       self.currentPlaying = filepath
       self.nextPlaying.insert(0, self.currentPlaying)
       self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
-      #logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(filepath))
       
    def enqueue(self, filepath):
       """
