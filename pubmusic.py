@@ -7,6 +7,7 @@ from vlcclient import VLCClient
 from medialib import mediaLib
 from ezlogger import ezLogger
 from cliinterface import cliInterface
+from webinterface import webInterface
 
 print ("#######################################################")
 print ("#  _____       _                         _      ___   #")
@@ -277,6 +278,7 @@ library = mediaLib( config.media_dir )
 player = playerCtl( config.startVolume )
 # starting the main cli interface
 cli = cliInterface(logger, player, library)
+web = webInterface()
 time.sleep(1)
 if config.autostart_playback:
    player.add(library.getRandomSong()) # automatic first song
