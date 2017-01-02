@@ -194,6 +194,14 @@ class playerCtl:
       """
       return self.getCleanTitle(self.currentPlaying)
       
+   def getPlaylist(self):
+      """
+      Returns the current playlist
+      """
+      returnlist = self.nextPlaying
+      returnlist.insert(0,self.currentPlaying)
+      return returnlist
+      
    def getCleanTitle(self, filepath):
       """
       Returns the clean title of a given filepath

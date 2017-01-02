@@ -49,6 +49,7 @@ class cliInterface:
             print("")
             print("current  - displays the current playing song")
             print("library  - displays the song library")
+            print("playlist - displays the current playlist")
             print("")
             
          elif userCommand == "exit":
@@ -93,10 +94,14 @@ class cliInterface:
          # Informative commands
          elif userCommand == "current":
             print(self.player.getCurrentPlaying())
+            
+         elif userCommand == "playlist":
+            for songs in self.player.getPlaylist():
+               print (self.player.getCleanTitle(songs))
            
          elif userCommand == "library":
             i = 0
-            for song in library.getSongList():
+            for song in self.library.getSongList():
                print(str(i).zfill(4) + " - " + self.player.getCleanTitle(song))
                i = i + 1
          
