@@ -25,8 +25,9 @@ logger = ezLogger()
 
 logger.dispLogEntry("info", "initializing, please wait...")
 
-# TODO: Make the following line multiplatform
-os.system("nohup /usr/bin/vlc --intf telnet  --telnet-password admin &>/dev/null &")
+# TODO: Make the following lines multiplatform
+sys.stdout.write('\33]0;Pubmusic2\a')
+os.system("nohup vlc --intf telnet  --telnet-password admin &>/dev/null &")
 time.sleep(1) # Waiting for vlc to launch
 
 logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + project_version)
@@ -66,12 +67,15 @@ class playerCtl:
                   self.currentPlaying = self.nextPlaying.pop(0)
                   self.vlc.raw("delete " + str(self.currentVlcPlaylistId))
                   self.currentVlcPlaylistId = self.currentVlcPlaylistId + 1
+                  
                self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
                logger.dispLogEntry("playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
+               
             if int(self.getVlcIsCurrentlyPlaying()) == 0 and not self.nextPlaying:
                # Playback is stopped and playlist is empty
                self.currentPlaying = ""
                self.vlc.raw("delete " + str(self.currentVlcPlaylistId))
+               
          except ValueError:
             pass
             
@@ -104,7 +108,7 @@ class playerCtl:
       
    def next(self):
       """
-      Plays thje next title in the playlist
+      Plays the next title in the playlist
       """
       self.vlc.next()
       
@@ -198,7 +202,7 @@ class playerCtl:
 library = mediaLib()
 # initializing our media player controller
 player = playerCtl()
-# starting the mnain cli interface
+# starting the main cli interface
 cli = cliInterface(logger, player, library)
 time.sleep(1)
 player.add(library.getRandomSong()) # automatic first song

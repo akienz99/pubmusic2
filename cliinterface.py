@@ -104,10 +104,8 @@ class cliInterface:
                print (self.player.getCleanTitle(songs))
            
          elif userCommand == "library":
-            i = 0
-            for song in self.library.getSongList():
+            for i, song in enumerate(self.library.getSongList()):
                print(str(i).zfill(4) + " - " + self.player.getCleanTitle(song))
-               i = i + 1
          
          # No input given
          else:
