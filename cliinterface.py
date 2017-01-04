@@ -97,15 +97,15 @@ class cliInterface:
                      print("given argument has to be \"up\", \"down\" or a number")
                   
             else:
-               print("Not enough arguments given")
+               print("Current volume: " + str(self.player.getVolume()))
          
          # Informative commands
          elif userCommand == "current":
             print(self.player.getCurrentPlaying())
             
          elif userCommand == "playlist":
-            for songs in self.player.getPlaylist():
-               print (self.player.getCleanTitle(songs))
+            for i, song in enumerate(self.player.getPlaylist()):
+               print (str(i) + " - " +self.player.getCleanTitle(song))
            
          elif userCommand == "library":
             for i, song in enumerate(self.library.getSongList()):

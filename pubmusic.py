@@ -53,6 +53,7 @@ class playerCtl:
    def __init__(self):
       self.vlc.connect() #Esthablishing a connection via VLCClient class
       logger.dispLogEntry("info", "connected to vlc media player")
+      self.volume(70) # Don't blow our ears away!
       self.startMonitoringThread()
             
    def _monitoringThread(self):      
@@ -173,12 +174,11 @@ class playerCtl:
    def getVolume(self):
       """
       Returns the current playback volume
-      FIXME: This command is broken due to vlc return value
       """
-      try:
-         return float(self.vlc.volume()) # FIXME coprrect conversion to int/float
-      except ValueError:
-         return 100
+      currentVolume = float(self.vlc.volume().decode("utf-8").replace(",", "."))
+      while currentVolume == 1.0: # Fix for inconsistent vlc output
+         currentVolume = float(self.vlc.volume().decode("utf-8").replace(",", "."))
+      return currentVolume
       
    def getVlcInternalCurrentTitle(self):
       """
