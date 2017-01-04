@@ -45,6 +45,7 @@ class cliInterface:
             print("random   - adds a random song")
             print("autofill - adds 10 random songs")
             print("next     - skips to the next song")
+            print("skip     - skips a given amount of songs")
             print("volume   - controls the playback volume")
             print("")
             print("current  - displays the current playing song")
@@ -75,6 +76,9 @@ class cliInterface:
          
          elif userCommand == "next":
             self.player.next()
+            
+         elif userCommand == "skip":
+            self.player.skip(int(userInput.split(" ")[1]))
      
          elif userCommand == "volume":
             if len(userInput.split(" ")) >= 2:

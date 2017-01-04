@@ -81,7 +81,7 @@ class playerCtl:
             
          self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
          
-         time.sleep(1)
+         time.sleep(0.1) # FIXME Interval
       
    def startMonitoringThread(self):
       Thread(target=self._monitoringThread).start()
@@ -111,6 +111,14 @@ class playerCtl:
       Plays the next title in the playlist
       """
       self.vlc.next()
+      
+   def skip(self, n):
+      """
+      Skips a given amount of titles
+      """
+      for i in range(0, n):
+         self.next()
+         time.sleep(0.5) # FIXME Direct access to playlist
       
    def volume(self, vol):
       """
@@ -161,6 +169,16 @@ class playerCtl:
       Executes a raw telnet command
       """
       self.vlc.raw(command)
+   
+   def getVolume(self):
+      """
+      Returns the current playback volume
+      FIXME: This command is broken due to vlc return value
+      """
+      try:
+         return float(self.vlc.volume()) # FIXME coprrect conversion to int/float
+      except ValueError:
+         return 100
       
    def getVlcInternalCurrentTitle(self):
       """
