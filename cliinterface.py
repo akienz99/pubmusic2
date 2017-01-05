@@ -2,16 +2,16 @@ import sys
 from threading import Thread
 
 class cliInterface:
-   
-   cliThread = None
-   
-   # Variables for used objects from pubmusic.py
-   # See this file for init
-   logger = None
-   player = None
-   library = None
-   
+      
    def __init__(self, logger, player, library):
+      
+      self.cliThread = None
+      # Variables for used objects from pubmusic.py
+      # See this file for init
+      self.logger = None
+      self.player = None
+      self.library = None
+      
       # Setting the class variables to our objects
       self.logger = logger
       self.player = player

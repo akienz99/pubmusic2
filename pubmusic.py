@@ -60,21 +60,22 @@ class playerCtl:
 
    # TODO: play/pause syncronisation with VLC
    # TODO: MP3 tag access
-   
-   vlc = VLCClient("::1")
-   # VLC connection for monitoring thread to avoid multiple telnet send commands
-   # at the same time, i.e. when user is changing songs while check is in 
-   # progress. This scenario would cause a telnet timeout and crash
-   vlcMonitoring = VLCClient("::1")
-   
-   currentPlaying = ""
-   currentPlayingFromVlc = ""
-   currentVlcPlaylistId = 4 - 1 # The Vlc playlist index starts with 4
-   vlcIsPlaying = ""
-   nextPlaying = []
-   threadStopper = False
 
    def __init__(self):
+      
+      self.vlc = VLCClient("::1")
+      # VLC connection for monitoring thread to avoid multiple telnet send commands
+      # at the same time, i.e. when user is changing songs while check is in 
+      # progress. This scenario would cause a telnet timeout and crash
+      self.vlcMonitoring = VLCClient("::1")
+      
+      self.currentPlaying = ""
+      self.currentPlayingFromVlc = ""
+      self.currentVlcPlaylistId = 4 - 1 # The Vlc playlist index starts with 4
+      self.vlcIsPlaying = ""
+      self.nextPlaying = []
+      self.threadStopper = False
+ 
       self.vlc.connect() #Esthablishing a connection via VLCClient class
       self.vlcMonitoring.connect() # Seperate connection for monitoring thread
       logger.dispLogEntry("info", "connected to vlc media player")
