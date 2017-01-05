@@ -44,6 +44,13 @@ request. Regular contributors can also get direct access if to the repository.
 * API for external control (via HTTP-API)
 * Configuration file
 
+## Configuration
+
+At the moment, configuration is done via a special class in pubmuisc.py.
+There you can set various options like the verbosity level or the media 
+directory. Configuration will be extended from time to time to allow more
+specific options and use scenarios.
+
 ## License
 
 Licenced under the MIT-License
