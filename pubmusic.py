@@ -18,17 +18,37 @@ print ("# |_|    \__,_|_.__/|_| |_| |_|\__,_|___/_|\___|____| #")
 print ("#                                                     #")
 print ("#######################################################")
 
+class config:
+   """
+   Main configuration, might be moved to a seperate file later
+   
+   --- Edit this section to your needs! ---
+   """
+   # Sets the amount of logging messages, lower number means less output
+   logger_verbosity = 3
+   # If True, VLC media player wil be started automatically
+   autostart_vlc = True
+   # If True, a random song will be automatically queued and played
+   autostart_playback = True
+   # Location of the used audio files, relative paths are supported
+   media_dir = "./media/"
+   
+   """
+   --- Configuration section ends here! ---
+   """
+   
 project_version = "0.0.1-alpha1"
 
 # Initializing our logger for use in playerCtl
-logger = ezLogger()
+logger = ezLogger( config.logger_verbosity )
 
 logger.dispLogEntry("info", "initializing, please wait...")
 
 # TODO: Make the following lines multiplatform
 sys.stdout.write('\33]0;Pubmusic2\a')
-os.system("nohup vlc --intf telnet  --telnet-password admin &>/dev/null &")
-time.sleep(1) # Waiting for vlc to launch
+if config.autostart_vlc:
+   os.system("nohup vlc --intf telnet  --telnet-password admin &>/dev/null &")
+   time.sleep(1) # Waiting for vlc to launch
 
 logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + project_version)
    
@@ -222,10 +242,11 @@ class playerCtl:
          return ""
    
 # initializing our media library
-library = mediaLib()
+library = mediaLib( config.media_dir )
 # initializing our media player controller
 player = playerCtl()
 # starting the main cli interface
 cli = cliInterface(logger, player, library)
 time.sleep(1)
-player.add(library.getRandomSong()) # automatic first song
+if config.autostart_playback:
+   player.add(library.getRandomSong()) # automatic first song
