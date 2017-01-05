@@ -2,6 +2,9 @@ import sys
 from threading import Thread
 
 class cliInterface:
+   """
+   Command line interface for Pubmusic2
+   """
       
    def __init__(self, logger, player, library):
       
@@ -21,6 +24,10 @@ class cliInterface:
    
    
    def cliThreadClass(self):
+      """
+      Thread that runs in an endless-loop for recieving and processing
+      user input.
+      """
       global input
       self.logger.dispLogEntry("info","preparing cli environment")
       print("Interactive command line for pubmusic2")
