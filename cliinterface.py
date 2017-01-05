@@ -41,7 +41,6 @@ class cliInterface:
          
          # General commands
          if userCommand == "help":
-            # TODO: Extend help
             print("Available commands:")
             print("")
             print("help     - displays this message")
@@ -85,7 +84,10 @@ class cliInterface:
             self.player.next()
             
          elif userCommand == "skip":
-            self.player.skip(int(userInput.split(" ")[1]))
+            try:
+               self.player.skip(int(userInput.split(" ")[1]))
+            except IndexError:
+               print ("Please enter the amount of titles to skip")
      
          elif userCommand == "volume":
             if len(userInput.split(" ")) >= 2:

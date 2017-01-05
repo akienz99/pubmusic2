@@ -30,6 +30,8 @@ class config:
    autostart_vlc = True
    # If True, a random song will be automatically queued and played
    autostart_playback = True
+   # The volume with which the player starts playback
+   startVolume = 70
    # Location of the used audio files, relative paths are supported
    media_dir = "./media/"
    
@@ -61,7 +63,7 @@ class playerCtl:
    # TODO: play/pause syncronisation with VLC
    # TODO: MP3 tag access
 
-   def __init__(self):
+   def __init__(self, startVol = 70):
       
       self.vlc = VLCClient("::1")
       # VLC connection for monitoring thread to avoid multiple telnet send commands
@@ -79,7 +81,7 @@ class playerCtl:
       self.vlc.connect() #Esthablishing a connection via VLCClient class
       self.vlcMonitoring.connect() # Seperate connection for monitoring thread
       logger.dispLogEntry("info", "connected to vlc media player")
-      self.volume(70) # Don't blow our ears away!
+      self.volume( startVol ) # Setting start value from config
       self.startMonitoringThread()
             
    def _monitoringThread(self):      
@@ -92,7 +94,7 @@ class playerCtl:
                # Playing title has changed
                if self.nextPlaying: # If Playlist is not empty
                   self.currentPlaying = self.nextPlaying.pop(0)
-                  self.vlcMonitoring.raw("delete " + str(self.currentVlcPlaylistId))
+                  self.deleteFromVlcPlaylist(self.currentVlcPlaylistId)
                   self.currentVlcPlaylistId = self.currentVlcPlaylistId + 1
                   
                self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
@@ -101,14 +103,16 @@ class playerCtl:
             if int(self.getVlcIsCurrentlyPlaying()) == 0 and not self.nextPlaying:
                # Playback is stopped and playlist is empty
                self.currentPlaying = ""
-               self.vlcMonitoring.raw("delete " + str(self.currentVlcPlaylistId))
+               self.deleteFromVlcPlaylist(self.currentVlcPlaylistId)
                
          except ValueError:
-            pass
+            # TODO: This might be fixed with second vlc connection thread
+            logger.warn("Inconsistency in VLC output detected")
+            logger.warn("Playlist might be asynchronous!")
             
          self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
          
-         time.sleep(0.1) # FIXME Interval
+         time.sleep(0.1)
       
    def startMonitoringThread(self):
       Thread(target=self._monitoringThread).start()
@@ -217,6 +221,12 @@ class playerCtl:
       Returns 1 when playing, 0 when not
       """
       return self.vlcMonitoring.raw("is_playing")
+      
+   def deleteFromVlcPlaylist(self, pID):
+      """
+      Deletes the Song with the given id from VLC internal playlist
+      """
+      self.vlcMonitoring.raw("delete " + str(pID))
    
    def getCurrentPlaying(self):
       """
@@ -245,7 +255,7 @@ class playerCtl:
 # initializing our media library
 library = mediaLib( config.media_dir )
 # initializing our media player controller
-player = playerCtl()
+player = playerCtl( config.startVolume )
 # starting the main cli interface
 cli = cliInterface(logger, player, library)
 time.sleep(1)
