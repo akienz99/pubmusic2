@@ -42,6 +42,10 @@ class playerCtl:
    # TODO: MP3 tag access
    
    vlc = VLCClient("::1")
+   # VLC connection for monitoring thread to avoid multiple telnet send commands
+   # at the same time, i.e. when user is changing songs while check is in 
+   # progress. This scenario would cause a telnet timeout and crash
+   vlcMonitoring = VLCClient("::1")
    
    currentPlaying = ""
    currentPlayingFromVlc = ""
@@ -52,6 +56,7 @@ class playerCtl:
 
    def __init__(self):
       self.vlc.connect() #Esthablishing a connection via VLCClient class
+      self.vlcMonitoring.connect() # Seperate connection for monitoring thread
       logger.dispLogEntry("info", "connected to vlc media player")
       self.volume(70) # Don't blow our ears away!
       self.startMonitoringThread()
@@ -66,7 +71,7 @@ class playerCtl:
                # Playing title has changed
                if self.nextPlaying: # If Playlist is not empty
                   self.currentPlaying = self.nextPlaying.pop(0)
-                  self.vlc.raw("delete " + str(self.currentVlcPlaylistId))
+                  self.vlcMonitoring.raw("delete " + str(self.currentVlcPlaylistId))
                   self.currentVlcPlaylistId = self.currentVlcPlaylistId + 1
                   
                self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
@@ -75,7 +80,7 @@ class playerCtl:
             if int(self.getVlcIsCurrentlyPlaying()) == 0 and not self.nextPlaying:
                # Playback is stopped and playlist is empty
                self.currentPlaying = ""
-               self.vlc.raw("delete " + str(self.currentVlcPlaylistId))
+               self.vlcMonitoring.raw("delete " + str(self.currentVlcPlaylistId))
                
          except ValueError:
             pass
@@ -184,13 +189,13 @@ class playerCtl:
       """
       Returns the internal name of the current playing title
       """
-      return self.vlc.raw("get_title")
+      return self.vlcMonitoring.raw("get_title")
       
    def getVlcIsCurrentlyPlaying(self):
       """
       Returns 1 when playing, 0 when not
       """
-      return self.vlc.raw("is_playing")
+      return self.vlcMonitoring.raw("is_playing")
    
    def getCurrentPlaying(self):
       """
