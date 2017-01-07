@@ -2,7 +2,9 @@
 Advanced collaborative media player based on python and vlc media player
 
 **Note: This project is in active development and not finished yet**
+
 **Project Homepage:** https://akienz.de/projekte/pubmusic/
+
 ![screenshot](screenshot.png)
 
 This project can be seen like a modern approach of building a music box.
