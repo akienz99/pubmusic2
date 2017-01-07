@@ -3,6 +3,8 @@ Advanced collaborative media player based on python and vlc media player
 
 **Note: This project is in active development and not finished yet**
 
+![screenshot](screenshot.png)
+
 This project can be seen like a modern approach of building a music box.
 Users can enqueue songs via a web-interface and can i.e. vote for songs or
 control the playback. A role managment system is planned so that only 

@@ -29,7 +29,7 @@ class config:
    # If True, VLC media player wil be started automatically
    autostart_vlc = True
    # If True, a random song will be automatically queued and played
-   autostart_playback = True
+   autostart_playback = False
    # The volume with which the player starts playback
    startVolume = 70
    # Location of the used audio files, relative paths are supported
