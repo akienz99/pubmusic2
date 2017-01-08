@@ -27,7 +27,7 @@ manually
 ## Contribution
 
 If you like to contribute to this project, feel free to fork and send me a pull
-request. Regular contributors can also get direct access if to the repository.
+request. Regular contributors can also get direct access to the repository.
 
 ## Currently implemented features
 
