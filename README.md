@@ -15,14 +15,25 @@ reordering.
 
 ## Requirements
 
-* Unix-based operation system (Multiplatform support is coming soon)
+* Linux or Windows operating system (macOS might be coming)
 * Python 2.7 or Python 3 environment
 * Installation of VLC Media Player
 
-Note: This software can be used on non-unix systems. However, you have to comment
-out the line `os.system("nohup /usr/bin/vlc --intf telnet  --telnet-password 
-admin &>/dev/null &")` in pubmusic.py and start a telnet instance of vlc
-manually
+Note: Support for Windows is in early beta. Some features might not be 100% stable
+
+## Launching the application
+
+### Windows
+
+Just double-click on the pubmusic_windows.bat script
+
+### Linux (GUI)
+
+Double-click on pubmusic_linux.sh. You might need to add the executable flag.
+
+### Linux (from terminal)
+
+`python pubmusic.py`
 
 ## Contribution
 
