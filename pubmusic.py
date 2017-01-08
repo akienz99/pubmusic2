@@ -7,7 +7,7 @@ from vlcclient import VLCClient
 from medialib import mediaLib
 from ezlogger import ezLogger
 from cliinterface import cliInterface
-from webinterface import webInterface
+from websocket import webSocket
 
 print ("#######################################################")
 print ("#  _____       _                         _      ___   #")

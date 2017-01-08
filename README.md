@@ -18,7 +18,6 @@ reordering.
 * Linux or Windows operating system (macOS might be coming)
 * Python 2.7 or Python 3 environment
 * Installation of VLC Media Player
-* cherryPy as dependency for the webinterface -> `pip install cherrypy`
 
 Note: Support for Windows is in early beta. Some features might not be 100% stable
 
