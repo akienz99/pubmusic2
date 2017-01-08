@@ -29,7 +29,7 @@ class config:
    # If True, VLC media player wil be started automatically
    autostart_vlc = True
    # If True, a random song will be automatically queued and played
-   autostart_playback = False
+   autostart_playback = True
    # The volume with which the player starts playback
    startVolume = 70
    # Location of the used audio files, relative paths are supported
@@ -46,11 +46,27 @@ logger = ezLogger( config.logger_verbosity )
 
 logger.dispLogEntry("info", "initializing, please wait...")
 
-# TODO: Make the following lines multiplatform
 sys.stdout.write('\33]0;Pubmusic2\a')
 if config.autostart_vlc:
-   os.system("nohup vlc --intf telnet  --telnet-password admin &>/dev/null &")
-   time.sleep(1) # Waiting for vlc to launch
+   user_os = sys.platform.lower()
+   if user_os == "linux" or user_os == "linux2": 
+      os.system("nohup vlc --intf telnet  --telnet-password admin &>/dev/null &")
+      time.sleep(1) # Waiting for vlc to launch
+      
+   elif user_os == "win32" or user_os == "cygwin":
+      # TODO: This section needs testing
+      import subprocess
+      subprocess.call(['C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe','--telnet-password admin &>/dev/null'])
+      time.sleep(1)
+        
+   else:
+      logger.warning("You are running a currently unsupported system. Autostart is disabled")
+      try: 
+         input = raw_input
+      except NameError:
+         pass
+         
+      input("Start VLC manually and press Enter to continue")
 
 logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + project_version)
    
@@ -78,7 +94,10 @@ class playerCtl:
       self.nextPlaying = []
       self.threadStopper = False
  
-      self.vlc.connect() #Esthablishing a connection via VLCClient class
+      try:
+         self.vlc.connect() #Esthablishing a connection via VLCClient class
+      except ConnectionRefusedError:
+         logger.error("Connection to vlc could not be established!")
       self.vlcMonitoring.connect() # Seperate connection for monitoring thread
       logger.dispLogEntry("info", "connected to vlc media player")
       self.volume( startVol ) # Setting start value from config
