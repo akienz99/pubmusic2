@@ -55,8 +55,8 @@ if config.autostart_vlc:
       
    elif user_os == "win32" or user_os == "cygwin":
       # TODO: This section needs testing
-      import subprocess
-      subprocess.call(['C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe','--telnet-password admin &>/dev/null'])
+      # This took literally two hours for me to figure out 
+      os.spawnl(os.P_NOWAIT,'C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe','vlc.exe --intf telnet --telnet-password admin')
       time.sleep(1)
         
    else:
