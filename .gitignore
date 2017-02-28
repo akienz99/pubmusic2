@@ -18,6 +18,8 @@
 *.sql
 *.sqlite
 
+media
+
 /media/
 /__pycache__/
 *.pyc

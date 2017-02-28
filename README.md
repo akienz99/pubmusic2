@@ -66,6 +66,15 @@ There you can set various options like the verbosity level or the media
 directory. Configuration will be extended from time to time to allow more
 specific options and use scenarios.
 
+## GTK+ Interface
+
+This software features a simple GTK+ interface, which is disabled by default to
+avoid creating a dependency. To enable the interface, set `enableGtkInterface`
+to `True` in the configuration class.
+
+**Note:** This interface is still in development and has some bugs which may
+lead to random crashes. Do not use this in production.
+
 ## License
 
 Licenced under the MIT-License
