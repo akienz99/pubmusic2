@@ -120,12 +120,7 @@ audio-volume-medium-symbolic</property>
         <property name="subtitle">Pubmusic2</property>
         <property name="show_close_button">True</property>
         <child>
-          <object class="GtkButton" id="btn_info">
-            <property name="label" translatable="yes">Info</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-          </object>
+          <placeholder/>
         </child>
       </object>
     </child>

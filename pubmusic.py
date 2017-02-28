@@ -7,7 +7,6 @@ from vlcclient import VLCClient
 from medialib import mediaLib
 from ezlogger import ezLogger
 from cliinterface import cliInterface
-from gtkinterface import gtkInterface, gtkEventHandler
 
 print ("#######################################################")
 print ("#  _____       _                         _      ___   #")
@@ -35,8 +34,8 @@ class config:
    startVolume = 70
    # Location of the used audio files, relative paths are supported
    media_dir = "./media/"
-   # Set this to true if you want the GTK+-Interface to be enabled
-   enableGtkInterface = True
+   # Set this to true if you want the GTK+ Interface to be enabled
+   enableGtkInterface = False
    
    """
    --- Configuration section ends here! ---
@@ -281,6 +280,8 @@ player = playerCtl( config.startVolume )
 # starting the main cli interface
 cli = cliInterface(logger, player, library)
 if config.enableGtkInterface:
+   # Late import of gtk, so it doesn't become a dependency
+   from gtkinterface import gtkInterface
    gtkIf = gtkInterface(logger, player, library)
 time.sleep(1)
 if config.autostart_playback:
