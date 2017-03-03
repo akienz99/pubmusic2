@@ -8,22 +8,14 @@ from medialib import mediaLib
 from ezlogger import ezLogger
 from cliinterface import cliInterface
 
-print ("#######################################################")
-print ("#  _____       _                         _      ___   #")
-print ("# |  __ \     | |                       (_)    |__ \  #")
-print ("# | |__) |   _| |__  _ __ ___  _   _ ___ _  ___   ) | #")
-print ("# |  ___/ | | | '_ \| '_ ` _ \| | | / __| |/ __| / /  #")
-print ("# | |   | |_| | |_) | | | | | | |_| \__ \ | (__ / /_  #")
-print ("# |_|    \__,_|_.__/|_| |_| |_|\__,_|___/_|\___|____| #")
-print ("#                                                     #")
-print ("#######################################################")
-
 class config:
    """
    Main configuration, might be moved to a seperate file later
    
    --- Edit this section to your needs! ---
    """
+   # Current version
+   project_version = "0.0.1"
    # Sets the amount of logging messages, lower number means less output
    logger_verbosity = 3
    # If True, VLC media player wil be started automatically
@@ -40,23 +32,24 @@ class config:
    """
    --- Configuration section ends here! ---
    """
-   
-project_version = "0.0.1-alpha1"
 
 # Initializing our logger for use in playerCtl
 logger = ezLogger( config.logger_verbosity )
 
 logger.dispLogEntry("info", "initializing, please wait...")
 
+# Sets window title
 sys.stdout.write('\33]0;Pubmusic2\a')
+
 if config.autostart_vlc:
    user_os = sys.platform.lower()
+   logger.info("attempting to start vlc automatically")
    if user_os == "linux" or user_os == "linux2": 
       os.system("nohup vlc --intf telnet  --telnet-password admin &>/dev/null &")
       time.sleep(1) # Waiting for vlc to launch
       
    elif user_os == "win32" or user_os == "cygwin":
-      # TODO: This section needs testing
+      # TODO: Only works for default vlc path, other way to get vlc.exe???
       # This took literally two hours for me to figure out 
       os.spawnl(os.P_NOWAIT,'C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe','vlc.exe --intf telnet --telnet-password admin')
       time.sleep(1)
@@ -70,7 +63,7 @@ if config.autostart_vlc:
          
       input("Start VLC manually and press Enter to continue")
 
-logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + project_version)
+logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + config.project_version)
    
 class playerCtl:
    """
@@ -98,10 +91,12 @@ class playerCtl:
  
       try:
          self.vlc.connect() #Esthablishing a connection via VLCClient class
+         self.vlcMonitoring.connect() # Seperate connection for monitoring thread
+         logger.dispLogEntry("info", "connected to vlc media player")
       except ConnectionRefusedError:
+         # TODO: Further error handling
          logger.error("Connection to vlc could not be established!")
-      self.vlcMonitoring.connect() # Seperate connection for monitoring thread
-      logger.dispLogEntry("info", "connected to vlc media player")
+
       self.volume( startVol ) # Setting start value from config
       self.startMonitoringThread()
             
@@ -170,7 +165,7 @@ class playerCtl:
       """
       for i in range(0, n):
          self.next()
-         time.sleep(0.5) # FIXME Direct access to playlist
+         time.sleep(0.5) # FIXME: Direct access to playlist
       
    def volume(self, vol):
       """
@@ -279,10 +274,12 @@ library = mediaLib( config.media_dir )
 player = playerCtl( config.startVolume )
 # starting the main cli interface
 cli = cliInterface(logger, player, library)
+
 if config.enableGtkInterface:
    # Late import of gtk, so it doesn't become a dependency
    from gtkinterface import gtkInterface
    gtkIf = gtkInterface(logger, player, library)
-time.sleep(1)
+   
 if config.autostart_playback:
+   time.sleep(1)
    player.add(library.getRandomSong()) # automatic first song
