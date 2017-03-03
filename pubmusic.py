@@ -26,6 +26,8 @@ class config:
    startVolume = 70
    # Location of the used audio files, relative paths are supported
    media_dir = "./media/"
+   # Don't set this to false unless you know what you are doing!
+   enableCliInterface = True
    # Set this to true if you want the GTK+ Interface to be enabled
    enableGtkInterface = False
    
@@ -269,11 +271,13 @@ class playerCtl:
          return ""
    
 # initializing our media library
-library = mediaLib( config.media_dir )
+library = mediaLib(config.media_dir)
 # initializing our media player controller
-player = playerCtl( config.startVolume )
-# starting the main cli interface
-cli = cliInterface(logger, player, library)
+player = playerCtl(config.startVolume)
+
+if config.enableCliInterface:
+   # starting the main cli interface
+   cli = cliInterface(logger, player, library)
 
 if config.enableGtkInterface:
    # Late import of gtk, so it doesn't become a dependency
