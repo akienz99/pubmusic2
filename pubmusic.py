@@ -34,38 +34,6 @@ class config:
    """
    --- Configuration section ends here! ---
    """
-
-# Initializing our logger for use in playerCtl
-logger = ezLogger( config.logger_verbosity )
-
-logger.dispLogEntry("info", "initializing, please wait...")
-
-# Sets window title
-sys.stdout.write('\33]0;Pubmusic2\a')
-
-if config.autostart_vlc:
-   user_os = sys.platform.lower()
-   logger.info("attempting to start vlc automatically")
-   if user_os == "linux" or user_os == "linux2": 
-      os.system("nohup vlc --intf telnet  --telnet-password admin &>/dev/null &")
-      time.sleep(1) # Waiting for vlc to launch
-      
-   elif user_os == "win32" or user_os == "cygwin":
-      # TODO: Only works for default vlc path, other way to get vlc.exe???
-      # This took literally two hours for me to figure out 
-      os.spawnl(os.P_NOWAIT,'C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe','vlc.exe --intf telnet --telnet-password admin')
-      time.sleep(1)
-        
-   else:
-      logger.warning("You are running a currently unsupported system. Autostart is disabled")
-      try: 
-         input = raw_input
-      except NameError:
-         pass
-         
-      input("Start VLC manually and press Enter to continue")
-
-logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + config.project_version)
    
 class playerCtl:
    """
@@ -270,20 +238,53 @@ class playerCtl:
       else:
          return ""
    
-# initializing our media library
-library = mediaLib(config.media_dir)
-# initializing our media player controller
-player = playerCtl(config.startVolume)
-
-if config.enableCliInterface:
-   # starting the main cli interface
-   cli = cliInterface(logger, player, library)
-
-if config.enableGtkInterface:
-   # Late import of gtk, so it doesn't become a dependency
-   from gtkinterface import gtkInterface
-   gtkIf = gtkInterface(logger, player, library)
+if __name__ == '__main__':
    
-if config.autostart_playback:
-   time.sleep(1)
-   player.add(library.getRandomSong()) # automatic first song
+   logger = ezLogger(config.logger_verbosity)
+
+   logger.dispLogEntry("info", "initializing, please wait...")
+
+   # Sets window title
+   sys.stdout.write('\33]0;Pubmusic2\a')
+
+   if config.autostart_vlc:
+      user_os = sys.platform.lower()
+      logger.info("attempting to start vlc automatically")
+      if user_os == "linux" or user_os == "linux2": 
+         os.system("nohup vlc --intf telnet  --telnet-password admin &>/dev/null &")
+         time.sleep(1) # Waiting for vlc to launch
+         
+      elif user_os == "win32" or user_os == "cygwin":
+         # TODO: Only works for default vlc path, other way to get vlc.exe???
+         # This took literally two hours for me to figure out 
+         os.spawnl(os.P_NOWAIT,'C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe','vlc.exe --intf telnet --telnet-password admin')
+         time.sleep(1)
+      
+      else:
+         logger.warning("You are running a currently unsupported system. Autostart is disabled")
+         try: 
+            input = raw_input
+         except NameError:
+            pass
+            
+         input("Start VLC manually and press Enter to continue")
+
+   logger.dispLogEntry("welcome", "Welcome to Pubmusic2, version " + config.project_version)
+
+   # initializing our media library
+   library = mediaLib(config.media_dir)
+   # initializing our media player controller
+   player = playerCtl(config.startVolume)
+
+   if config.enableCliInterface:
+      # starting the main cli interface
+      cli = cliInterface(logger, player, library)
+
+   if config.enableGtkInterface:
+      # Late import of gtk, so it doesn't become a dependency
+      from gtkinterface import gtkInterface
+      gtkIf = gtkInterface(logger, player, library)
+      
+   if config.autostart_playback:
+      time.sleep(1)
+      player.add(library.getRandomSong()) # automatic first song
