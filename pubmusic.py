@@ -32,7 +32,7 @@ class Config:
     enableCliInterface = True
 
     # Set this to true if you want the GTK+ Interface to be enabled
-    enableGtkInterface = True
+    enableGtkInterface = False
 
     """
     --- Configuration section ends here! ---
