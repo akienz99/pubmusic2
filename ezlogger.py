@@ -1,7 +1,8 @@
+""" simple logger """
 import time
 
 
-class ezLogger:
+class EzLogger:
     """
     Simple console logger
 
@@ -15,42 +16,42 @@ class ezLogger:
 
     def __init__(self, verbose_level=3):
         self.verbosity = verbose_level
-        self.isCurrentlyRunning = False
+        self.is_currently_running = False
 
-        self.messageList = []
+        self.message_list = []
 
-    def dispLogEntry(self, msg_type, msg_value):
+    def disp_log_entry(self, msg_type, msg_value):
         """
         Displays a log entry in the console
         """
 
-        while self.isCurrentlyRunning == True:
+        while self.is_currently_running is True:
             time.sleep(0.05)
 
-        logMessage = ""
+        log_message = ""
 
-        self.isCurrentlyRunning = True
+        self.is_currently_running = True
         if msg_type == "error" and self.verbosity >= 1:
-            logMessage = "\033[1;31m[error] " + msg_value + "\033[0m"
+            log_message = "\033[1;31m[error] " + msg_value + "\033[0m"
 
         elif msg_type == "warning" and self.verbosity >= 2:
-            logMessage = "\033[1;33m[warning] " + msg_value + "\033[0m"
+            log_message = "\033[1;33m[warning] " + msg_value + "\033[0m"
 
         elif msg_type == "playlist" and self.verbosity >= 3:
-            logMessage = "\033[1;32m[playlist] " + msg_value + "\033[0m"
+            log_message = "\033[1;32m[playlist] " + msg_value + "\033[0m"
 
         elif msg_type == "info" and self.verbosity >= 3:
-            logMessage = "\033[1;34m[info] " + msg_value + "\033[0m"
+            log_message = "\033[1;34m[info] " + msg_value + "\033[0m"
 
         elif self.verbosity >= 3:
-            logMessage = "\033[1;34m[" + msg_type + \
+            log_message = "\033[1;34m[" + msg_type + \
                 "] " + msg_value + "\033[0m"
 
-        if logMessage != "":
-            print(logMessage)
-            self.messageList.append(logMessage)
+        if log_message != "":
+            print(log_message)
+            self.message_list.append(log_message)
 
-        self.isCurrentlyRunning = False
+        self.is_currently_running = False
 
     # Short calls for different log types -> future
 
@@ -58,51 +59,51 @@ class ezLogger:
         """
         Displays an error message in the log
         """
-        self.dispLogEntry("error", message)
+        self.disp_log_entry("error", message)
 
     def warning(self, message):
         """
         Displays an warning message in the log
         """
-        self.dispLogEntry("warning", message)
+        self.disp_log_entry("warning", message)
 
     def playlist(self, message):
         """
         Displays a playlist info in the log
         """
-        self.dispLogEntry("playlist", message)
+        self.disp_log_entry("playlist", message)
 
     def info(self, message):
         """
         Displays an info message in the log
         """
-        self.dispLogEntry("info", message)
+        self.disp_log_entry("info", message)
 
     # getters and setters
 
-    def getLastMessage(self):
+    def get_last_message(self):
         """
         Gets the last displayed message
         """
         try:
-            return self.messageList[-1]
+            return self.message_list[-1]
         except IndexError:
             return ""
 
-    def getMessageList(self):
+    def get_message_list(self):
         """
         Gets a list of all displayed messages
         """
-        return self.messageList
+        return self.message_list
 
-    def getVerbosity(self):
+    def get_verbosity(self):
         """
         Returns the current verbosity level
         """
         return self.verbosity
 
-    def setVerbosity(self, newValue):
+    def set_verbosity(self, new_value):
         """
         Sets the verbosity level
         """
-        self.verbosity = newValue
+        self.verbosity = new_value
