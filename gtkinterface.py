@@ -52,7 +52,7 @@ class GtkInterface(object):
         # TODO: Independent thread stopping mechanism
         time.sleep(2)
 
-        while not self.player.threadStopper:
+        while not self.player.thread_stopper:
             # update window subtitle
             # FIXME: This causes random crashes
             # self.headerBar.set_title(self.player.get_current_playing())
