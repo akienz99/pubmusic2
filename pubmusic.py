@@ -54,18 +54,18 @@ class PlayerCtl:
         # VLC connection for monitoring thread to avoid multiple telnet send commands
         # at the same time, i.e. when user is changing songs while check is in
         # progress. This scenario would cause a telnet timeout and crash
-        self.vlcMonitoring = VLCClient("::1")
+        self.vlc_monitoring = VLCClient("::1")
 
-        self.currentPlaying = ""
-        self.currentPlayingFromVlc = ""
-        self.currentVlcPlaylistId = 4 - 1  # The Vlc playlist index starts with 4
-        self.vlcIsPlaying = ""
-        self.nextPlaying = []
-        self.threadStopper = False
+        self.current_playing = ""
+        self.current_playing_from_vlc = ""
+        self.current_vlc_playlist_id = 4 - 1  # The Vlc playlist index starts with 4
+        self.vlc_is_playing = ""
+        self.next_playing = []
+        self.thread_stopper = False
 
         try:
             self.vlc.connect()  # Esthablishing a connection via VLCClient class
-            self.vlcMonitoring.connect()  # Seperate connection for monitoring thread
+            self.vlc_monitoring.connect()  # Seperate connection for monitoring thread
             logger.disp_log_entry("info", "connected to vlc media player")
         except ConnectionRefusedError:
             # TODO: Further error handling
@@ -77,32 +77,33 @@ class PlayerCtl:
     def _monitoring_thread(self):
 
         time.sleep(0.5)
-        self.currentPlayingFromVlc = self.get_vlc_internal_current_title()
-        while self.threadStopper == False:
+        self.current_playing_from_vlc = self.get_vlc_internal_current_title()
+        while not self.thread_stopper:
             try:  # Fixing inconsistency in Vlc playback status
-                if self.currentPlayingFromVlc != self.get_vlc_internal_current_title() and int(self.get_vlc_is_currently_playing()) == 1:
+                if self.current_playing_from_vlc != self.get_vlc_internal_current_title() \
+                   and int(self.get_vlc_is_currently_playing()) == 1:
                     # Playing title has changed
-                    if self.nextPlaying:  # If Playlist is not empty
-                        self.currentPlaying = self.nextPlaying.pop(0)
+                    if self.next_playing:  # If Playlist is not empty
+                        self.current_playing = self.next_playing.pop(0)
                         self.delete_from_vlc_playlist(
-                            self.currentVlcPlaylistId)
-                        self.currentVlcPlaylistId = self.currentVlcPlaylistId + 1
+                            self.current_vlc_playlist_id)
+                        self.current_vlc_playlist_id = self.current_vlc_playlist_id + 1
 
-                    self.currentPlayingFromVlc = self.get_vlc_internal_current_title()
+                    self.current_playing_from_vlc = self.get_vlc_internal_current_title()
                     logger.disp_log_entry(
-                        "playlist", "Now playing: " + self.get_clean_title(self.currentPlaying))
+                        "playlist", "Now playing: " + self.get_clean_title(self.current_playing))
 
-                if int(self.get_vlc_is_currently_playing()) == 0 and not self.nextPlaying:
+                if int(self.get_vlc_is_currently_playing()) == 0 and not self.next_playing:
                     # Playback is stopped and playlist is empty
-                    self.currentPlaying = ""
-                    self.delete_from_vlc_playlist(self.currentVlcPlaylistId)
+                    self.current_playing = ""
+                    self.delete_from_vlc_playlist(self.current_vlc_playlist_id)
 
             except ValueError:
                 # TODO: This might be fixed with second vlc connection thread
                 logger.warning("Inconsistency in VLC output detected")
                 logger.warning("Playlist might be asynchronous!")
 
-            self.vlcIsPlaying = self.get_vlc_is_currently_playing()
+            self.vlc_is_playing = self.get_vlc_is_currently_playing()
 
             time.sleep(0.1)
 
@@ -116,23 +117,23 @@ class PlayerCtl:
         """
         Stops the monitoring thread
         """
-        self.threadStopper = True
+        self.thread_stopper = True
 
     def add(self, filepath):
         """
         Adds and plays the given file to the playlist
         """
         self.vlc.add(filepath)
-        self.currentPlaying = filepath
-        self.nextPlaying.insert(0, self.currentPlaying)
-        self.vlcIsPlaying = self.get_vlc_is_currently_playing()
+        self.current_playing = filepath
+        self.next_playing.insert(0, self.current_playing)
+        self.vlc_is_playing = self.get_vlc_is_currently_playing()
 
     def enqueue(self, filepath):
         """
         Adds the given file to the end of the playlist
         """
         self.vlc.enqueue(filepath)
-        self.nextPlaying.append(filepath)
+        self.next_playing.append(filepath)
         logger.disp_log_entry("playlist", "Added to queue: " +
                               self.get_clean_title(filepath))
 
@@ -182,8 +183,8 @@ class PlayerCtl:
         Clears the playlist
         """
         self.vlc.clear()
-        self.nextPlaying = []
-        self.currentPlaying = None
+        self.next_playing = []
+        self.current_playing = None
         logger.disp_log_entry("warning", "cleared playlist")
 
     def shutdown(self):
@@ -215,31 +216,31 @@ class PlayerCtl:
         """
         Returns the internal name of the current playing title
         """
-        return self.vlcMonitoring.raw("get_title")
+        return self.vlc_monitoring.raw("get_title")
 
     def get_vlc_is_currently_playing(self):
         """
         Returns 1 when playing, 0 when not
         """
-        return self.vlcMonitoring.raw("is_playing")
+        return self.vlc_monitoring.raw("is_playing")
 
     def delete_from_vlc_playlist(self, trackid):
         """
         Deletes the Song with the given id from VLC internal playlist
         """
-        self.vlcMonitoring.raw("delete " + str(trackid))
+        self.vlc_monitoring.raw("delete " + str(trackid))
 
     def get_current_playing(self):
         """
         Returns the current title in a formatted form
         """
-        return self.get_clean_title(self.currentPlaying)
+        return self.get_clean_title(self.current_playing)
 
     def get_playlist(self):
         """
         Returns the current playlist
         """
-        returnlist = self.nextPlaying
+        returnlist = self.next_playing
         # returnlist.insert(0,self.currentPlaying)
         return returnlist
 
@@ -309,6 +310,6 @@ if __name__ == '__main__':
         time.sleep(1)
         player.add(library.get_random_song())  # automatic first song
 
-    while not player.threadStopper:
+    while not player.thread_stopper:
         # TODO: Testing
         time.sleep(1)
