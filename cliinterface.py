@@ -79,11 +79,11 @@ class CliInterface:
                         "warning", "Title with given id not found")
 
             elif user_command == "random":
-                self.player.enqueue(self.library.getRandomSong())
+                self.player.enqueue(self.library.get_random_song())
 
             elif user_command == "autofill":
                 for x in range(0, 10):
-                    self.player.enqueue(self.library.getRandomSong())
+                    self.player.enqueue(self.library.get_random_song())
 
             elif user_command == "next":
                 self.player.next()
