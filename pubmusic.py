@@ -1,15 +1,16 @@
 #!/usr/bin/python
+""" pubmusic2 """
 import os
 import sys
 import time
 from threading import Thread
 from vlcclient import VLCClient
-from medialib import mediaLib
-from ezlogger import ezLogger
-from cliinterface import cliInterface
+from medialib import MediaLib
+from ezlogger import EzLogger
+from cliinterface import CliInterface
 
 
-class config:
+class Config:
     """
     Main configuration, might be moved to a seperate file later
 
@@ -31,14 +32,14 @@ class config:
     enableCliInterface = True
 
     # Set this to true if you want the GTK+ Interface to be enabled
-    enableGtkInterface = False
+    enableGtkInterface = True
 
     """
     --- Configuration section ends here! ---
     """
 
 
-class playerCtl:
+class PlayerCtl:
     """
     VLC Media Player controller. This class contains the logic to interact
     with vlcclient and manage current playlist and status.
@@ -65,49 +66,56 @@ class playerCtl:
         try:
             self.vlc.connect()  # Esthablishing a connection via VLCClient class
             self.vlcMonitoring.connect()  # Seperate connection for monitoring thread
-            logger.dispLogEntry("info", "connected to vlc media player")
+            logger.disp_log_entry("info", "connected to vlc media player")
         except ConnectionRefusedError:
             # TODO: Further error handling
             logger.error("Connection to vlc could not be established!")
 
         self.volume(startVol)  # Setting start value from config
-        self.startMonitoringThread()
+        self.start_monitoring_thread()
 
-    def _monitoringThread(self):
+    def _monitoring_thread(self):
 
         time.sleep(0.5)
-        self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
+        self.currentPlayingFromVlc = self.get_vlc_internal_current_title()
         while self.threadStopper == False:
             try:  # Fixing inconsistency in Vlc playback status
-                if self.currentPlayingFromVlc != self.getVlcInternalCurrentTitle() and int(self.getVlcIsCurrentlyPlaying()) == 1:
+                if self.currentPlayingFromVlc != self.get_vlc_internal_current_title() and int(self.get_vlc_is_currently_playing()) == 1:
                     # Playing title has changed
                     if self.nextPlaying:  # If Playlist is not empty
                         self.currentPlaying = self.nextPlaying.pop(0)
-                        self.deleteFromVlcPlaylist(self.currentVlcPlaylistId)
+                        self.delete_from_vlc_playlist(
+                            self.currentVlcPlaylistId)
                         self.currentVlcPlaylistId = self.currentVlcPlaylistId + 1
 
-                    self.currentPlayingFromVlc = self.getVlcInternalCurrentTitle()
-                    logger.dispLogEntry(
-                        "playlist", "Now playing: " + self.getCleanTitle(self.currentPlaying))
+                    self.currentPlayingFromVlc = self.get_vlc_internal_current_title()
+                    logger.disp_log_entry(
+                        "playlist", "Now playing: " + self.get_clean_title(self.currentPlaying))
 
-                if int(self.getVlcIsCurrentlyPlaying()) == 0 and not self.nextPlaying:
+                if int(self.get_vlc_is_currently_playing()) == 0 and not self.nextPlaying:
                     # Playback is stopped and playlist is empty
                     self.currentPlaying = ""
-                    self.deleteFromVlcPlaylist(self.currentVlcPlaylistId)
+                    self.delete_from_vlc_playlist(self.currentVlcPlaylistId)
 
             except ValueError:
                 # TODO: This might be fixed with second vlc connection thread
-                logger.warn("Inconsistency in VLC output detected")
-                logger.warn("Playlist might be asynchronous!")
+                logger.warning("Inconsistency in VLC output detected")
+                logger.warning("Playlist might be asynchronous!")
 
-            self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
+            self.vlcIsPlaying = self.get_vlc_is_currently_playing()
 
             time.sleep(0.1)
 
-    def startMonitoringThread(self):
-        Thread(target=self._monitoringThread).start()
+    def start_monitoring_thread(self):
+        """
+        Starts the monitoring thread
+        """
+        Thread(target=self._monitoring_thread).start()
 
-    def stopMonitoringThread(self):
+    def stop_monitoring_thread(self):
+        """
+        Stops the monitoring thread
+        """
         self.threadStopper = True
 
     def add(self, filepath):
@@ -117,7 +125,7 @@ class playerCtl:
         self.vlc.add(filepath)
         self.currentPlaying = filepath
         self.nextPlaying.insert(0, self.currentPlaying)
-        self.vlcIsPlaying = self.getVlcIsCurrentlyPlaying()
+        self.vlcIsPlaying = self.get_vlc_is_currently_playing()
 
     def enqueue(self, filepath):
         """
@@ -125,8 +133,8 @@ class playerCtl:
         """
         self.vlc.enqueue(filepath)
         self.nextPlaying.append(filepath)
-        logger.dispLogEntry("playlist", "Added to queue: " +
-                            self.getCleanTitle(filepath))
+        logger.disp_log_entry("playlist", "Added to queue: " +
+                              self.get_clean_title(filepath))
 
     def next(self):
         """
@@ -134,11 +142,11 @@ class playerCtl:
         """
         self.vlc.next()
 
-    def skip(self, n):
+    def skip(self, amount):
         """
         Skips a given amount of titles
         """
-        for i in range(0, n):
+        for i in range(0, amount):
             self.next()
             time.sleep(0.5)  # FIXME: Direct access to playlist
 
@@ -147,21 +155,21 @@ class playerCtl:
         Sets the volume to the given input
         """
         self.vlc.volume(vol)
-        logger.dispLogEntry("info", "setting volume to " + str(vol))
+        logger.disp_log_entry("info", "setting volume to " + str(vol))
 
     def volup(self):
         """
         Increases the volume by 10 percent
         """
         self.vlc.volup()
-        logger.dispLogEntry("info", "raising volume")
+        logger.disp_log_entry("info", "raising volume")
 
     def voldown(self):
         """
         Lowers the volume by 10 percent
         """
         self.vlc.voldown()
-        logger.dispLogEntry("info", "lowering volume")
+        logger.disp_log_entry("info", "lowering volume")
 
     def stop(self):
         """
@@ -176,15 +184,15 @@ class playerCtl:
         self.vlc.clear()
         self.nextPlaying = []
         self.currentPlaying = None
-        logger.dispLogEntry("warning", "cleared playlist")
+        logger.disp_log_entry("warning", "cleared playlist")
 
     def shutdown(self):
         """
         Terminates VLC and the title monitoring Thread
         """
         self.vlc.raw("shutdown")
-        self.stopMonitoringThread()
-        logger.dispLogEntry("info", "Shutting down vlc client")
+        self.stop_monitoring_thread()
+        logger.disp_log_entry("info", "Shutting down vlc client")
 
     def raw(self, command):
         """
@@ -192,42 +200,42 @@ class playerCtl:
         """
         self.vlc.raw(command)
 
-    def getVolume(self):
+    def get_volume(self):
         """
         Returns the current playback volume
         """
-        currentVolume = float(
+        current_volume = float(
             self.vlc.volume().decode("utf-8").replace(",", "."))
-        while currentVolume == 1.0:  # Fix for inconsistent vlc output
-            currentVolume = float(
+        while current_volume == 1.0:  # Fix for inconsistent vlc output
+            current_volume = float(
                 self.vlc.volume().decode("utf-8").replace(",", "."))
-        return currentVolume
+        return current_volume
 
-    def getVlcInternalCurrentTitle(self):
+    def get_vlc_internal_current_title(self):
         """
         Returns the internal name of the current playing title
         """
         return self.vlcMonitoring.raw("get_title")
 
-    def getVlcIsCurrentlyPlaying(self):
+    def get_vlc_is_currently_playing(self):
         """
         Returns 1 when playing, 0 when not
         """
         return self.vlcMonitoring.raw("is_playing")
 
-    def deleteFromVlcPlaylist(self, pID):
+    def delete_from_vlc_playlist(self, trackid):
         """
         Deletes the Song with the given id from VLC internal playlist
         """
-        self.vlcMonitoring.raw("delete " + str(pID))
+        self.vlcMonitoring.raw("delete " + str(trackid))
 
-    def getCurrentPlaying(self):
+    def get_current_playing(self):
         """
         Returns the current title in a formatted form
         """
-        return self.getCleanTitle(self.currentPlaying)
+        return self.get_clean_title(self.currentPlaying)
 
-    def getPlaylist(self):
+    def get_playlist(self):
         """
         Returns the current playlist
         """
@@ -235,7 +243,7 @@ class playerCtl:
         # returnlist.insert(0,self.currentPlaying)
         return returnlist
 
-    def getCleanTitle(self, filepath):
+    def get_clean_title(self, filepath):
         """
         Returns the clean title of a given filepath
         """
@@ -248,14 +256,14 @@ class playerCtl:
 
 if __name__ == '__main__':
 
-    logger = ezLogger(config.logger_verbosity)
+    logger = EzLogger(Config.logger_verbosity)
 
-    logger.dispLogEntry("info", "initializing, please wait...")
+    logger.disp_log_entry("info", "initializing, please wait...")
 
     # Sets window title
     sys.stdout.write('\33]0;Pubmusic2\a')
 
-    if config.autostart_vlc:
+    if Config.autostart_vlc:
         user_os = sys.platform.lower()
         logger.info("attempting to start vlc automatically")
         if user_os == "linux" or user_os == "linux2":
@@ -280,26 +288,26 @@ if __name__ == '__main__':
 
             input("Start VLC manually and press Enter to continue")
 
-    logger.dispLogEntry(
-        "welcome", "Welcome to Pubmusic2, version " + config.project_version)
+    logger.disp_log_entry(
+        "welcome", "Welcome to Pubmusic2, version " + Config.project_version)
 
     # initializing our media library
-    library = mediaLib(config.media_dir)
+    library = MediaLib(Config.media_dir)
     # initializing our media player controller
-    player = playerCtl(config.startVolume)
+    player = PlayerCtl(Config.startVolume)
 
-    if config.enableCliInterface:
+    if Config.enableCliInterface:
         # starting the main cli interface
-        cli = cliInterface(logger, player, library)
+        cli = CliInterface(logger, player, library)
 
-    if config.enableGtkInterface:
+    if Config.enableGtkInterface:
         # Late import of gtk, so it doesn't become a dependency
-        from gtkinterface import gtkInterface
-        gtkIf = gtkInterface(logger, player, library)
+        from gtkinterface import GtkInterface
+        gtkIf = GtkInterface(logger, player, library)
 
-    if config.autostart_playback:
+    if Config.autostart_playback:
         time.sleep(1)
-        player.add(library.getRandomSong())  # automatic first song
+        player.add(library.get_random_song())  # automatic first song
 
     while not player.threadStopper:
         # TODO: Testing

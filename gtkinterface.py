@@ -1,12 +1,13 @@
+""" GTK interface """
 import sys
 import time
+from threading import Thread
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from threading import Thread
 
-
-class gtkInterface(object):
+class GtkInterface(object):
     """
     GTK+ interface for Pubmusic2
     """
@@ -19,23 +20,23 @@ class gtkInterface(object):
 
         builder = Gtk.Builder()
         builder.add_from_file("pubmusic_gtk.glade")
-        builder.connect_signals(gtkEventHandler(
+        builder.connect_signals(GtkEventHandler(
             self.logger, self.player, self.library))
 
         window_main = builder.get_object("window_main")
         window_main.set_title("Pubmusic2")
 
         # Volume init
-        self.volSlider = builder.get_object("slider_volume")
-        self.headerBar = builder.get_object("header_bar")
+        self.vol_slider = builder.get_object("slider_volume")
+        self.header_bar = builder.get_object("header_bar")
 
         # Display the main window
         window_main.show_all()
-        self.gtkThread = Thread(target=self._gtkThread).start()
+        self.gtk_thread = Thread(target=self._gtk_thread).start()
 
-        self.startGuiUpdaterThread()
+        self.start_gui_updater_thread()
 
-    def _gtkThread(self):
+    def _gtk_thread(self):
         """
         Thread for managing GTK+
         """
@@ -44,7 +45,7 @@ class gtkInterface(object):
         except Exception:
             logger.error("Gui has crashed!")
 
-    def _guiUpdaterThread(self):
+    def _gui_updater_thread(self):
         """
         Thread that synchronizes the gui with values from the player
         """
@@ -54,21 +55,21 @@ class gtkInterface(object):
         while not self.player.threadStopper:
             # update window subtitle
             # FIXME: This causes random crashes
-            # self.headerBar.set_title(self.player.getCurrentPlaying())
+            # self.headerBar.set_title(self.player.get_current_playing())
 
             # Set volume slider to actual volume
             try:
-                self.volSlider.set_value(self.player.getVolume() / 100)
+                self.vol_slider.set_value(self.player.get_volume() / 100)
             except ValueError:
                 self.logger.error("Could not recieve volume level for gui")
 
             time.sleep(1)  # Should be a good interval (for now)
 
-    def startGuiUpdaterThread(self):
-        self.guiUpdaterThread = Thread(target=self._guiUpdaterThread).start()
+    def start_gui_updater_thread(self):
+        self.gui_updateder_thread = Thread(target=self._gui_updater_thread).start()
 
 
-class gtkEventHandler(object):
+class GtkEventHandler(object):
     """
     Handlers for all GUI elements
     """
@@ -83,12 +84,12 @@ class gtkEventHandler(object):
         self.player.next()
 
     def on_btn_library_clicked(self, *args):
-        for i, song in enumerate(self.library.getSongList()):
-            print(str(i).zfill(4) + " - " + self.player.getCleanTitle(song))
+        for i, song in enumerate(self.library.get_song_list()):
+            print(str(i).zfill(4) + " - " + self.player.get_clean_title(song))
 
     def on_btn_playlist_clicked(self, *args):
-        for i, song in enumerate(self.player.getPlaylist()):
-            print(str(i) + " - " + self.player.getCleanTitle(song))
+        for i, song in enumerate(self.player.get_playlist()):
+            print(str(i) + " - " + self.player.get_clean_title(song))
 
     def on_btn_close_clicked(self, *args):
         Gtk.main_quit()
@@ -101,7 +102,7 @@ class gtkEventHandler(object):
 
     def on_btn_autofill_clicked(self, *args):
         for x in range(0, 10):
-            self.player.enqueue(self.library.getRandomSong())
+            self.player.enqueue(self.library.get_random_song())
 
     def on_window_main_destroy(self, *args):
         self.on_btn_close_clicked()

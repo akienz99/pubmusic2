@@ -72,7 +72,7 @@ class CliInterface:
 
             elif user_command == "add":
                 try:
-                    self.player.enqueue(self.library.getSongList()[
+                    self.player.enqueue(self.library.get_song_list()[
                         int(user_input.split(" ")[1])])
                 except IndexError:
                     self.logger.dispLogEntry(
@@ -113,20 +113,20 @@ class CliInterface:
                                 a number""")
 
                 else:
-                    print("Current volume: " + str(self.player.getVolume()))
+                    print("Current volume: " + str(self.player.get_volume()))
 
             # Informative commands
             elif user_command == "current":
-                print(self.player.getCurrentPlaying())
+                print(self.player.get_current_playing())
 
             elif user_command == "playlist":
-                for i, song in enumerate(self.player.getPlaylist()):
-                    print(str(i) + " - " + self.player.getCleanTitle(song))
+                for i, song in enumerate(self.player.get_playlist()):
+                    print(str(i) + " - " + self.player.get_clean_title(song))
 
             elif user_command == "library":
-                for i, song in enumerate(self.library.getSongList()):
+                for i, song in enumerate(self.library.get_song_list()):
                     print(str(i).zfill(4) + " - " +
-                          self.player.getCleanTitle(song))
+                          self.player.get_clean_title(song))
 
             # No input given
             else:
