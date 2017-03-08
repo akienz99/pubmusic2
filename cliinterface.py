@@ -1,15 +1,16 @@
+""" cli interface """
 import sys
 from threading import Thread
 
 
-class cliInterface:
+class CliInterface:
     """
     Command line interface for Pubmusic2
     """
 
     def __init__(self, logger, player, library):
 
-        self.cliThread = None
+        self.clithread = None
         # Variables for used objects from pubmusic.py
         # See this file for init
         self.logger = None
@@ -21,15 +22,15 @@ class cliInterface:
         self.player = player
         self.library = library
 
-        self.cliThread = Thread(target=self.cliThreadClass).start()
+        self.clithread = Thread(target=self.cli_thread_class).start()
 
-    def cliThreadClass(self):
+    def cli_thread_class(self):
         """
         Thread that runs in an endless-loop for recieving and processing
         user input.
         """
         global input
-        self.logger.dispLogEntry("info", "preparing cli environment")
+        self.logger.disp_log_entry("info", "preparing cli environment")
         print("Interactive command line for pubmusic2")
         print("Enter \"help\" for a list of available commands")
         try:
@@ -38,11 +39,11 @@ class cliInterface:
             pass
 
         while True:
-            userInput = input("-> ").strip()
-            userCommand = userInput.split(" ")[0].lower()
+            user_input = input("-> ").strip()
+            user_command = user_input.split(" ")[0].lower()
 
             # General commands
-            if userCommand == "help":
+            if user_command == "help":
                 print("Available commands:")
                 print("")
                 print("help     - displays this message")
@@ -61,74 +62,75 @@ class cliInterface:
                 print("playlist - displays the current playlist")
                 print("")
 
-            elif userCommand == "exit":
+            elif user_command == "exit":
                 self.player.shutdown()
                 sys.exit()
 
             # playback control
-            elif userCommand == "play":
+            elif user_command == "play":
                 self.player.raw("play")
 
-            elif userCommand == "add":
+            elif user_command == "add":
                 try:
                     self.player.enqueue(self.library.getSongList()[
-                                        int(userInput.split(" ")[1])])
+                        int(user_input.split(" ")[1])])
                 except IndexError:
                     self.logger.dispLogEntry(
                         "warning", "Title with given id not found")
 
-            elif userCommand == "random":
+            elif user_command == "random":
                 self.player.enqueue(self.library.getRandomSong())
 
-            elif userCommand == "autofill":
+            elif user_command == "autofill":
                 for x in range(0, 10):
                     self.player.enqueue(self.library.getRandomSong())
 
-            elif userCommand == "next":
+            elif user_command == "next":
                 self.player.next()
 
-            elif userCommand == "skip":
+            elif user_command == "skip":
                 try:
-                    self.player.skip(int(userInput.split(" ")[1]))
+                    self.player.skip(int(user_input.split(" ")[1]))
                 except IndexError:
                     print("Please enter the amount of titles to skip")
 
-            elif userCommand == "volume":
-                if len(userInput.split(" ")) >= 2:
-                    if userInput.split(" ")[1] == "up":
+            elif user_command == "volume":
+                if len(user_input.split(" ")) >= 2:
+                    if user_input.split(" ")[1] == "up":
                         self.player.volup()
 
-                    elif userInput.split(" ")[1] == "down":
+                    elif user_input.split(" ")[1] == "down":
                         self.player.voldown()
 
                     else:
                         try:
-                            if isinstance(int(userInput.split(" ")[1]), int):
+                            if isinstance(int(user_input.split(" ")[1]), int):
                                 # parameter is a integer
-                                self.player.volume(userInput.split(" ")[1])
+                                self.player.volume(user_input.split(" ")[1])
                         except ValueError:
                             print(
-                                "given argument has to be \"up\", \"down\" or a number")
+                                """given argument has to be \"up\", \"down\" or
+                                a number""")
 
                 else:
                     print("Current volume: " + str(self.player.getVolume()))
 
             # Informative commands
-            elif userCommand == "current":
+            elif user_command == "current":
                 print(self.player.getCurrentPlaying())
 
-            elif userCommand == "playlist":
+            elif user_command == "playlist":
                 for i, song in enumerate(self.player.getPlaylist()):
                     print(str(i) + " - " + self.player.getCleanTitle(song))
 
-            elif userCommand == "library":
+            elif user_command == "library":
                 for i, song in enumerate(self.library.getSongList()):
                     print(str(i).zfill(4) + " - " +
                           self.player.getCleanTitle(song))
 
             # No input given
             else:
-                if userCommand == "":
+                if user_command == "":
                     print("No input was given. Please try again!")
                 else:
-                    print("Command \"" + userCommand + "\" not found!")
+                    print("Command \"" + user_command + "\" not found!")
