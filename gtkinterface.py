@@ -43,7 +43,7 @@ class GtkInterface(object):
         try:
             Gtk.main()
         except Exception:
-            logger.error("Gui has crashed!")
+            self.logger.error("Gui has crashed!")
 
     def _gui_updater_thread(self):
         """
